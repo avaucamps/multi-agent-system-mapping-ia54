@@ -9,31 +9,31 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1338570791109724}
+  m_RootGameObject: {fileID: 1225127393987232}
   m_IsPrefabAsset: 1
---- !u!1 &1338570791109724
+--- !u!1 &1225127393987232
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4711861240819660}
-  - component: {fileID: 20933774117606838}
-  - component: {fileID: 81840896893957920}
+  - component: {fileID: 4983961260417458}
+  - component: {fileID: 20741576401637834}
+  - component: {fileID: 81447787298683962}
   m_Layer: 0
-  m_Name: Agent
+  m_Name: Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4711861240819660
+--- !u!4 &4983961260417458
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1338570791109724}
+  m_GameObject: {fileID: 1225127393987232}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -7.6887703, y: -0.30812168, z: -3.6781487}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -41,12 +41,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &20933774117606838
+--- !u!20 &20741576401637834
 Camera:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1338570791109724}
+  m_GameObject: {fileID: 1225127393987232}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
@@ -81,10 +81,10 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &81840896893957920
+--- !u!81 &81447787298683962
 AudioListener:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1338570791109724}
+  m_GameObject: {fileID: 1225127393987232}
   m_Enabled: 1

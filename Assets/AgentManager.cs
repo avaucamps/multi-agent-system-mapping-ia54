@@ -5,29 +5,30 @@ using System.IO;
 
 public class AgentManager : MonoBehaviour {
 
-    public float xOrigin = 0;
-    public float yOrigin = 0;
-    public float zOrigin = 0;
-    public float xScale = 0;
-    public float yScale = 0;
-    public float zScale = 0;
+    public Camera agent;
+    public Vector3 positionModel;
+    public Vector3 scaleModel;
     public int numberOfAgents = 5;
+    public bool isScreenshotEnabled = false;
 
-    private float xStart;
-    private float xEnd;
-    private float yStart;
-    private float yEnd;
-    private float zStart;
-    private float zEnd;
+    private Vector3 positionStart;
+    private Vector3 positionEnd;
     private Dictionary<Camera, Vector3> agentsDict = new Dictionary<Camera, Vector3>();
     private string directoryPath = "";
+    private NetworkManager networkManager;
 
-	void Start () {
-        directoryPath = "Session_" + System.DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss");
+    void Start () {
+        networkManager = NetworkManager.Instance;
+
+        directoryPath = "Session_" + System.DateTime.Now.ToString("dd-MM-yyyy_HH-mmss");
         Directory.CreateDirectory(directoryPath);
         SetBounds();
         SpawnCameras(numberOfAgents);
-        StartCoroutine(TakeAllScreenshot());
+
+        if (isScreenshotEnabled)
+        {
+            StartCoroutine(TakeAllScreenshot());
+        }
     }
 
     private void SpawnCameras(int number)
@@ -36,10 +37,10 @@ public class AgentManager : MonoBehaviour {
         {
             Vector3 position = GetRandomCoordinate();
             Camera agentInstance = Instantiate(
-                Resources.Load("Agent", typeof(Camera)),
+                agent,
                 position,
                 Quaternion.identity
-            ) as Camera;
+            );
             agentInstance.enabled = false;
             agentInstance.transform.rotation = Quaternion.Euler(-90, 0, 0);
             agentsDict.Add(agentInstance, position);
@@ -48,20 +49,16 @@ public class AgentManager : MonoBehaviour {
 
     private void SetBounds()
     {
-        xStart = xOrigin - (0.5f * xScale);
-        xEnd = xOrigin + (0.5f * xScale);
-        yStart = yOrigin - (0.5f * yScale);
-        yEnd = yOrigin + (0.5f * yScale);
-        zStart = zOrigin - (0.5f * zScale);
-        zEnd = zOrigin + (0.5f * zScale);
+        positionStart = positionModel - (0.5f * scaleModel);
+        positionEnd = positionModel + (0.5f * scaleModel);
     }
 
     private Vector3 GetRandomCoordinate()
     {
         return new Vector3(
-            Random.Range(xStart, xEnd),
-            Random.Range(yStart, yEnd),
-            Random.Range(zStart, zEnd)
+            Random.Range(positionStart.x, positionEnd.x),
+            Random.Range(positionStart.y, positionEnd.y),
+            Random.Range(positionStart.z, positionEnd.z)
         );
     }
 
@@ -71,14 +68,19 @@ public class AgentManager : MonoBehaviour {
             DisableAllCameras();
             pair.Key.enabled = true;
             yield return new WaitForEndOfFrame();
-            TakeScreenshot(pair.Key, pair.Value);
+            networkManager.SendSpawnMessage(1, pair.Key.GetInstanceID().ToString());
+            networkManager.SendMessage(pair.Key.GetInstanceID().ToString(), 2, pair.Value.ToString());
+            TakeScreenshot(pair.Key);
         }
+
+        networkManager.EndCommunication();
     }
 
-    private void TakeScreenshot(Camera agent, Vector3 position)
+    private void TakeScreenshot(Camera agent)
     {
-        string filename = directoryPath + "\\" +  position.x + "_" + position.y + "_" + position.z + ".png";
+        string filename = directoryPath + "\\" + agent.GetInstanceID().ToString() + ".png";
         ScreenCapture.CaptureScreenshot(filename);
+        networkManager.SendMessage(agent.GetInstanceID().ToString(), 3, filename);
     }
 
     private void DisableAllCameras()
