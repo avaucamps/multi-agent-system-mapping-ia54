@@ -21,7 +21,12 @@ public class AgentManager : MonoBehaviour {
         networkManager = NetworkManager.Instance;
 
         directoryPath = "Session_" + System.DateTime.Now.ToString("dd-MM-yyyy_HH-mmss");
-        Directory.CreateDirectory(directoryPath);
+
+        if (isScreenshotEnabled)
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
         SetBounds();
         SpawnCameras(numberOfAgents);
 
@@ -43,6 +48,7 @@ public class AgentManager : MonoBehaviour {
             );
             agentInstance.enabled = false;
             agentInstance.transform.rotation = Quaternion.Euler(-90, 0, 0);
+            agentInstance.name = agentInstance.GetInstanceID().ToString();
             agentsDict.Add(agentInstance, position);
         }
     }

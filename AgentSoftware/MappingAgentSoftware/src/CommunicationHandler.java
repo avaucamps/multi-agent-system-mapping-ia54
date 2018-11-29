@@ -79,6 +79,8 @@ public class CommunicationHandler {
 	        		bytes.removeAll(bytes);
 	        	}
 	        }
+	        
+	        agentAction.communicationEnded();
 		} catch (IOException e) {
 			e.printStackTrace();
 		};
@@ -133,8 +135,8 @@ public class CommunicationHandler {
 	private static void handleAgentTookScreenshot(byte[] bytes, AgentAction agentAction) {
 		String fullMessage = new String(bytes, StandardCharsets.UTF_8);
 		String[] splittedMessage = fullMessage.split("#");
-		String agentId = splittedMessage[0];
-		String filepath = splittedMessage[1];
+		String agentId = splittedMessage[1];
+		String filepath = splittedMessage[2];
 		agentAction.agentTookScreenshot(agentId, filepath);
 	}
 	

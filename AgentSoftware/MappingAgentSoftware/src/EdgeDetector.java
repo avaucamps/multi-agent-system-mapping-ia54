@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Image;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -21,13 +20,15 @@ public class EdgeDetector {
 	private static final int RATIO = 3;
     private static final int KERNEL_SIZE = 3;
 	
-	public static void toEdgeImage(String imagePath) {
-		System.out.println(imagePath);
+    public static Image getEdgeImage(String originalImagePath) {
+    	return toEdgeImage(originalImagePath);
+    }
+    
+	private static Image toEdgeImage(String imagePath) {
 		Mat src = Imgcodecs.imread(imagePath);
 		
 		if (src.empty()) {
-			System.out.println("Image not found.");
-			return;
+			System.out.println("Image not found");
 		}
 		
 		Mat srcBlur = new Mat();
@@ -41,7 +42,7 @@ public class EdgeDetector {
         src.copyTo(dst, detectedEdges);
         Image img = HighGui.toBufferedImage(dst);
         
-        showEdgeImageInFrame(img);
+        return img;
 	}
 	
 	private static void showEdgeImageInFrame(Image image) {
