@@ -67,6 +67,10 @@ public class Environment {
 		setAgentsInformation(information);
 	}
 
+	public void addMatchingPoint(MatchingPoint matchingPoint) {
+		System.out.println(matchingPoint);
+	}
+
 	private void setAgentsInformation(ArrayList<String> information) {
 		support.firePropertyChange(
 				PropertyChangeConstants.IMAGE_PROCESSING_MESSAGE_NAME,

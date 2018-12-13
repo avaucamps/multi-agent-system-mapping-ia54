@@ -24,6 +24,11 @@ public class main {
 			public void allScreenshotsDone() {
 				environment.allScreenshotsDone();
 			}
+
+			@Override
+			public void receivedMatchPoints(MatchingPoint matchingPoint) {
+				environment.addMatchingPoint(matchingPoint);
+			}
 		};
 
 		Server serverImageProcessing = new Server(9992, Server.ClientType.imageProcessing, action);

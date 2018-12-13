@@ -4,4 +4,5 @@ public interface Action {
 	void agentMoved(String id, Vector3 position);
 	void agentTookScreenshot(String id, String filepath);
 	void allScreenshotsDone();
+	void receivedMatchPoints(MatchingPoint matchingPoint);
 }

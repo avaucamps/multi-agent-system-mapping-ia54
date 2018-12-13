@@ -1,9 +1,19 @@
 from NetworkHandler import NetworkHandler
 from Agent import Agent
+from sift_features import detect_sift_features
+from utils import remove_duplicates_matching_points
 
-def agents_received(agents):
+#Change base path when finished
+
+def agents_received(agents, networkHandler):
+    matching_points = []
     for agent in agents:
-        if type(agent) is Agent:
-            print(agent.getid())
+        matching_points.append(detect_sift_features(agent, agents))
+    
+    flat_list = [item for sublist in matching_points for item in sublist]
+    match_points = remove_duplicates_matching_points(flat_list)
+
+    networkHandler.send_match_points(match_points)
+
 
 networkHandler = NetworkHandler(agents_received)
