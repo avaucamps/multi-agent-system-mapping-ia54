@@ -1,57 +1,78 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.*;
 
 public class Environment {
-	
+
+	private ArrayList<String> agentsInformation;
+	private PropertyChangeSupport support;
 	private HashMap<Agent, Vector3> agents = new HashMap<Agent, Vector3>();
 	private final int numberOfNeighbors = 3;
 	
 	public Environment() {
-		setupEnvironment();
+		agentsInformation = new ArrayList<String>();
+		support = new PropertyChangeSupport(this);
 	}
-	
-	private void setupEnvironment() {
-		CommunicationHandler.createConnection(new AgentAction() {
 
-			@Override
-			public void agentSpawned(String id) {
-				agents.put(
-					new Agent(id),
-					new Vector3(0,0,0)
-				);
-			}
+	public void addPropertyChangeListener(PropertyChangeListener pcl) {
+		support.addPropertyChangeListener(pcl);
+	}
 
-			@Override
-			public void agentMoved(String id, Vector3 position) {
-				Optional<Agent> agent = AgentUtils.getAgent(id, agents);
-				agent.ifPresent(a -> {
-					agents.get(a).setVector3(
-						position.getX(), 
-						position.getY(),
-						position.getZ()
-					);
-					System.out.println("[" + id + "]Position: " + position.toString());
-				});
-			}
+	public void removePropertyChangeListener(PropertyChangeListener pcl) {
+		support.removePropertyChangeListener(pcl);
+	}
 
-			@Override
-			public void agentTookScreenshot(String id, String filepath) {
-				Optional<Agent> agent = AgentUtils.getAgent(id, agents);
-				agent.ifPresent(a -> {
-					a.setImagePath(filepath);
-				});
-			}
+	public void agentSpawned(String id) {
+		agents.put(
+				new Agent(id),
+				new Vector3(0,0,0)
+		);
+	}
 
-			@Override
-			public void communicationEnded() {
-				for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
-					entry.getKey().setEdgeImage();
-					entry.getKey().addNeighbors(
-						AgentUtils.getNeighbors(entry.getKey(), agents, numberOfNeighbors)
-					);
-				}
-			}
+	public void agentMoved(String id, Vector3 position) {
+		Optional<Agent> agent = AgentUtils.getAgent(id, agents);
+		agent.ifPresent(a -> {
+			agents.get(a).setVector3(
+					position.getX(),
+					position.getY(),
+					position.getZ()
+			);
+			System.out.println("[" + id + "]Position: " + position.toString());
 		});
+	}
+
+	public void agentTookScreenshot(String id, String filepath) {
+		Optional<Agent> agent = AgentUtils.getAgent(id, agents);
+		agent.ifPresent(a -> {
+			a.setImagePath(filepath);
+		});
+	}
+
+	public void allScreenshotsDone() {
+		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
+			entry.getKey().addNeighbors(
+					AgentUtils.getNeighbors(entry.getKey(), agents, numberOfNeighbors)
+			);
+		}
+
+		ArrayList<String> information = new ArrayList<>();
+		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
+			information.add(
+					AgentUtils.getAgentInformation(entry.getKey())
+			);
+		}
+
+		setAgentsInformation(information);
+	}
+
+	private void setAgentsInformation(ArrayList<String> information) {
+		support.firePropertyChange(
+				PropertyChangeConstants.IMAGE_PROCESSING_MESSAGE_NAME,
+				this.agentsInformation,
+				information
+		);
+		this.agentsInformation = information;
 	}
 }

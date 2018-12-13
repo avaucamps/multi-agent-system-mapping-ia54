@@ -56,6 +56,24 @@ public class AgentUtils {
 		return Optional.empty();
 	}
 	
+	public static String getAgentInformation(Agent agent) {
+		String information = "";
+		
+		information = "#";
+		information += agent.getId();
+		information += "#";
+		information += agent.getImagePath();
+		information += "#";
+		
+		HashMap<Agent, Vector3> neighbors = agent.getNeighbors();
+		for(Map.Entry<Agent, Vector3> entry: neighbors.entrySet()) {
+			information += entry.getKey().getId();
+			information += "#";
+		}
+		
+		return information;
+	}
+	
 	// Private methods
 	
 	private static HashMap<Agent, Vector3> getUpdatedNeighbors(Vector3 referantPosition, HashMap<Agent, Vector3> neighbors, Agent neighbor, Vector3 neighborPosition) {
