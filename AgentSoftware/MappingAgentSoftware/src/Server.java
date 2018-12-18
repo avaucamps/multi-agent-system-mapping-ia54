@@ -44,6 +44,7 @@ public class Server {
                     clientHandler.start();
 
                     System.out.println("Communication with simulation started.");
+                    return;
                 case imageProcessing:
                     clientHandler = new ImageProcessingClientHandler(
                             clientSocket,
@@ -55,6 +56,7 @@ public class Server {
                     clientHandler.start();
 
                     System.out.println("Communication with image processing started.");
+                    return;
             }
         } catch (IOException e) {
             e.printStackTrace();

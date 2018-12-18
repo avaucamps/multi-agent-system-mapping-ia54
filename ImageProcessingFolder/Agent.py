@@ -1,7 +1,7 @@
 from constants import base_path
 
 class Agent:
-
+    
     def __init__(self, id, image_path, neighbors_id_list):
         self.id = id
         self.image_path = base_path + "\\" + image_path

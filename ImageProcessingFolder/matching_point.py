@@ -1,17 +1,17 @@
 class MatchingPoint:
-    def __init__(self, image1, image2, x1, y1, x2, y2):
-        self.image1 = image1
-        self.image2 = image2
+    def __init__(self, agent1_id, agent2_id, x1, y1, x2, y2):
+        self.agent1_id = agent1_id
+        self.agent2_id = agent2_id
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
 
-    def get_image1(self):
-        return self.image1
+    def get_agent1_id(self):
+        return self.agent1_id
 
-    def get_image2(self):
-        return self.image2
+    def get_agent2_id(self):
+        return self.agent2_id
 
     def get_x1(self):
         return self.x1

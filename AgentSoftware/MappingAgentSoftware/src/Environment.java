@@ -7,12 +7,14 @@ import java.util.*;
 public class Environment {
 
 	private ArrayList<String> agentsInformation;
+	private ArrayList<MatchingPoint> matchPoints2D;
 	private PropertyChangeSupport support;
 	private HashMap<Agent, Vector3> agents = new HashMap<Agent, Vector3>();
 	private final int numberOfNeighbors = 3;
 	
 	public Environment() {
 		agentsInformation = new ArrayList<String>();
+		matchPoints2D = new ArrayList<MatchingPoint>();
 		support = new PropertyChangeSupport(this);
 	}
 
@@ -67,8 +69,8 @@ public class Environment {
 		setAgentsInformation(information);
 	}
 
-	public void addMatchingPoint(MatchingPoint matchingPoint) {
-		System.out.println(matchingPoint);
+	public void received2DMatchPoints(ArrayList<MatchingPoint> matchPoints) {
+		setAgents2DMatchPoints(matchPoints);
 	}
 
 	private void setAgentsInformation(ArrayList<String> information) {
@@ -78,5 +80,14 @@ public class Environment {
 				information
 		);
 		this.agentsInformation = information;
+	}
+
+	private void setAgents2DMatchPoints(ArrayList<MatchingPoint> matchPoints) {
+		support.firePropertyChange(
+				PropertyChangeConstants.SIMULATION_MESSAGE_NAME,
+				this.matchPoints2D,
+				matchPoints
+		);
+		this.matchPoints2D = matchPoints;
 	}
 }

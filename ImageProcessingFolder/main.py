@@ -10,8 +10,8 @@ def agents_received(agents, networkHandler):
     for agent in agents:
         matching_points.append(detect_sift_features(agent, agents))
     
-    flat_list = [item for sublist in matching_points for item in sublist]
-    match_points = remove_duplicates_matching_points(flat_list)
+    match_points = [item for sublist in matching_points for item in sublist]
+    #match_points = remove_duplicates_matching_points(flat_list)
 
     networkHandler.send_match_points(match_points)
 

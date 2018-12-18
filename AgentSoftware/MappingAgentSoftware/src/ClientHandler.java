@@ -21,9 +21,8 @@ abstract class ClientHandler extends Thread implements PropertyChangeListener {
 
     protected void sendMessage(String message) {
         try {
-            outputStream.write(
-                    message.getBytes()
-            );
+            outputStream.write(message.getBytes());
+            outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

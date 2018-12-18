@@ -3,16 +3,21 @@ using System.Collections;
 using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+
 public class NetworkManager : MonoBehaviour
 {
-    private Boolean socketReady = false;
-    private TcpClient mySocket;
-    private NetworkStream theStream;
-    private BinaryWriter theWriter;
-    private StreamReader theReader;
+
+    private TcpClient socketConnection;
+    private Thread clientThread;
+    private NetworkStream stream;
+    private BinaryWriter writer;
+    private StreamReader reader;
     private const String host = "localhost";
     private const Int32 port = 9991;
-
+    
     # region Singleton
 
     public static NetworkManager Instance;
@@ -26,7 +31,7 @@ public class NetworkManager : MonoBehaviour
 
     void Start()
     {
-        SetupSocket();
+        StartConnection();
     }
 
     public void SendSpawnMessage(int messageType, string message)
@@ -42,34 +47,70 @@ public class NetworkManager : MonoBehaviour
 
     public void EndCommunication()
     {
-        if (!socketReady)
+        if (socketConnection == null)
             return;
 
         byte endByte = 0;
-        theWriter.Write(endByte);
-        theWriter.Flush();
+        writer.Write(endByte);
+        writer.Flush();
     }
-
-    private void SetupSocket()
+    
+    private void StartConnection()
     {
         try
         {
-            mySocket = new TcpClient(host, port);
-            theStream = mySocket.GetStream();
-            theWriter = new BinaryWriter(theStream);
-            theReader = new StreamReader(theStream);
-            socketReady = true;
+            clientThread = new Thread(Listen);
+            clientThread.IsBackground = true;
+            clientThread.Start();
         }
         catch (Exception e)
         {
-            Debug.Log("Socket error: " + e);
+            Debug.Log(e);
+        }
+    }
+
+    private void Listen()
+    {
+        bool done = false;
+        socketConnection = new TcpClient(host, port);
+        stream = socketConnection.GetStream();
+        reader = new StreamReader(stream);
+        writer = new BinaryWriter(stream);
+        Byte[] bytes = new Byte[256];
+        
+        while (!done)
+        {
+            int length;
+
+            Debug.Log(stream.ReadByte());
+            if (stream.ReadByte() == 1)
+            {
+                while (stream.ReadByte() != 4)
+                {
+                    Debug.Log("start");
+                    Debug.Log(stream.ReadByte());
+                }
+                Debug.Log("end");
+            }
+            
+            /*while (stream.ReadByte() != 4)
+            {
+                length = stream.Read(bytes, 0, bytes.Length);
+                var incommingData = new byte[length]; 						
+                Array.Copy(bytes, 0, incommingData, 0, length);						
+                string serverMessage = Encoding.ASCII.GetString(incommingData); 						
+                Debug.Log("server message received as: " + serverMessage); 					
+            } */
         }
     }
 
     private void WriteSocket(int messageType, string theLine)
     {
-        if (!socketReady)
+        if (socketConnection == null)
+        {
             return;
+        }
+        
         String sth = "\x01";
         String stx = "\x02";
         String etx = "\x03";
@@ -79,27 +120,8 @@ public class NetworkManager : MonoBehaviour
         byte[] b = System.Text.Encoding.UTF8.GetBytes(foo);
         string unicode = System.Text.Encoding.UTF8.GetString(b);
         byte[] buffer = System.Text.Encoding.ASCII.GetBytes(unicode);
-        theWriter.Write(buffer);
+        writer.Write(buffer);
 
-        theWriter.Flush();
-    }
-
-    private String ReadSocket()
-    {
-        if (!socketReady)
-            return "";
-        if (theStream.DataAvailable)
-            return theReader.ReadLine();
-        return "";
-    }
-
-    private void CloseSocket()
-    {
-        if (!socketReady)
-            return;
-        theWriter.Close();
-        theReader.Close();
-        mySocket.Close();
-        socketReady = false;
+        writer.Flush();
     }
 }

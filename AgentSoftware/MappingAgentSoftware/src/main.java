@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class main {
 	
@@ -26,8 +27,8 @@ public class main {
 			}
 
 			@Override
-			public void receivedMatchPoints(MatchingPoint matchingPoint) {
-				environment.addMatchingPoint(matchingPoint);
+			public void received2DMatchPoints(ArrayList<MatchingPoint> matchingPoints) {
+				environment.received2DMatchPoints(matchingPoints);
 			}
 		};
 

@@ -6,7 +6,6 @@ import os
 from matching_point import MatchingPoint
 
 def detect_sift_features(agent, all_agents):
-    agent_image_path = agent.get_image_path()
     neighbors_id = agent.get_neighbors_id()
     neighbors = get_neighbors_object(all_agents, neighbors_id)
 
@@ -14,11 +13,10 @@ def detect_sift_features(agent, all_agents):
 
     matching_points = []
     for neighbor in neighbors:
-        neighbor_image_path = neighbor.get_image_path()
         matching_points.append(get_image_matches(
             sift, 
-            agent_image_path, 
-            neighbor_image_path
+            agent, 
+            neighbor
         ))
     
     return [item for sublist in matching_points for item in sublist]
@@ -34,10 +32,14 @@ def image_detect_and_compute(detector, img_name):
     return img, kp, des
     
 
-def get_image_matches(detector, img1_name, img2_name, nmatches=5):
+def get_image_matches(detector, agent1, agent2, nmatches=5):
+    img1_name = agent1.get_image_path()
+    img2_name = agent2.get_image_path()
     img1, kp1, des1 = image_detect_and_compute(detector, img1_name)
     img2, kp2, des2 = image_detect_and_compute(detector, img2_name)
 
+    if des1 is None or des2 is None:
+        return []
     bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=False)
     matches = bf.match(des1, des2)
     matches = sorted(matches, key = lambda x: x.distance)
@@ -49,7 +51,7 @@ def get_image_matches(detector, img1_name, img2_name, nmatches=5):
 
         (x1,y1) = kp1[img1_idx].pt
         (x2,y2) = kp2[img2_idx].pt
-        match_point = MatchingPoint(img1_name, img2_name, x1, y1, x2, y2)
+        match_point = MatchingPoint(agent1.get_id(), agent2.get_id(), x1, y1, x2, y2)
         matching_points.append(match_point)
 
     # img_matches = cv2.drawMatches(img1, kp1, img2, kp2, matches[:nmatches], img2, flags=2)

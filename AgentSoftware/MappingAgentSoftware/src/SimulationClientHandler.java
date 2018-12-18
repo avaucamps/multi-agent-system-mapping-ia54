@@ -21,10 +21,14 @@ public class SimulationClientHandler extends ClientHandler {
             return;
         }
 
-        ArrayList<String> messages = (ArrayList<String>) evt.getNewValue();
-        for(String message: messages) {
+        ArrayList<MatchingPoint> matchingPoints = (ArrayList<MatchingPoint>) evt.getNewValue();
+        for(MatchingPoint matchingPoint: matchingPoints) {
+            String message = buildMessage(matchingPoint);
             sendMessage(message);
+            System.out.println("Message sent to simulation: " + message);
         }
+
+        sendMessage("AllMessagesSent");
     }
 
     @Override
@@ -165,5 +169,20 @@ public class SimulationClientHandler extends ClientHandler {
         );
 
         return position3;
+    }
+
+    private String buildMessage(MatchingPoint matchingPoint) {
+        String message = "";
+        message += "\\u0001";
+        message += "#";
+        message += matchingPoint.getAgent1Id();
+        message += "#";
+        message += matchingPoint.getPointAgent1().getX();
+        message += "#";
+        message += matchingPoint.getPointAgent1().getY();
+        message += "#";
+        message += "\\u0004";
+
+        return message;
     }
 }

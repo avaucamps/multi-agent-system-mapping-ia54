@@ -38,7 +38,7 @@ public class AgentManager : MonoBehaviour {
 
     private void SpawnCameras(int number)
     {
-        for (int i = 0; i < number; i++)
+        /*for (int i = 0; i < number; i++)
         {
             Vector3 position = GetRandomCoordinate();
             Camera agentInstance = Instantiate(
@@ -46,11 +46,46 @@ public class AgentManager : MonoBehaviour {
                 position,
                 Quaternion.identity
             );
-            agentInstance.enabled = false;
+            //agentInstance.enabled = false;
             agentInstance.transform.rotation = Quaternion.Euler(-90, 0, 0);
             agentInstance.name = agentInstance.GetInstanceID().ToString();
             agentsDict.Add(agentInstance, position);
-        }
+        }*/
+        Vector3 position = new Vector3(1.455f, -0.332f, 4.611f);
+        Camera agentInstance = Instantiate(
+            agent,
+            position,
+            Quaternion.identity
+        );
+        agentInstance.fieldOfView = 70;
+        agentInstance.enabled = false;
+        agentInstance.transform.rotation = Quaternion.Euler(-90, 0, 0);
+        agentInstance.name = agentInstance.GetInstanceID().ToString();
+        agentsDict.Add(agentInstance, position);
+
+        Vector3 position2 = new Vector3(1.037f, -0.332f, 3.745f);
+        Camera agentInstance2 = Instantiate(
+            agent,
+            position2,
+            Quaternion.identity
+        );
+        agentInstance2.fieldOfView = 70;
+        agentInstance2.enabled = false;
+        agentInstance2.transform.rotation = Quaternion.Euler(-90, 0, 0);
+        agentInstance2.name = agentInstance.GetInstanceID().ToString();
+        agentsDict.Add(agentInstance2, position2);
+
+        Vector3 position3 = new Vector3(2.115f, -0.332f, 5.336f);
+        Camera agentInstance3 = Instantiate(
+            agent,
+            position3,
+            Quaternion.identity
+        );
+        agentInstance3.fieldOfView = 70;
+        agentInstance3.enabled = false;
+        agentInstance3.transform.rotation = Quaternion.Euler(-90, 0, 0);
+        agentInstance3.name = agentInstance.GetInstanceID().ToString();
+        agentsDict.Add(agentInstance3, position3);
     }
 
     private void SetBounds()
