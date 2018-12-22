@@ -24,11 +24,11 @@ public class SimulationClientHandler extends ClientHandler {
         ArrayList<MatchingPoint> matchingPoints = (ArrayList<MatchingPoint>) evt.getNewValue();
         for(MatchingPoint matchingPoint: matchingPoints) {
             String message = buildMessage(matchingPoint);
-            sendMessage(message);
             System.out.println("Message sent to simulation: " + message);
+            sendMessage(message);
         }
 
-        sendMessage("AllMessagesSent");
+        sendMessage("Done");
     }
 
     @Override
@@ -173,7 +173,6 @@ public class SimulationClientHandler extends ClientHandler {
 
     private String buildMessage(MatchingPoint matchingPoint) {
         String message = "";
-        message += "\\u0001";
         message += "#";
         message += matchingPoint.getAgent1Id();
         message += "#";
@@ -181,7 +180,6 @@ public class SimulationClientHandler extends ClientHandler {
         message += "#";
         message += matchingPoint.getPointAgent1().getY();
         message += "#";
-        message += "\\u0004";
 
         return message;
     }

@@ -16,6 +16,7 @@ public class AgentManager : MonoBehaviour {
     private Dictionary<Camera, Vector3> agentsDict = new Dictionary<Camera, Vector3>();
     private string directoryPath = "";
     private NetworkManager networkManager;
+    private List<FeaturePoint> featurePoints = new List<FeaturePoint>();
 
     void Start () {
         networkManager = NetworkManager.Instance;
@@ -34,6 +35,54 @@ public class AgentManager : MonoBehaviour {
         {
             StartCoroutine(TakeAllScreenshot());
         }
+    }
+
+    void Update()
+    {
+        foreach (FeaturePoint fp in featurePoints)
+        {
+            Vector3 worldPoint = Get3DPoint(fp.AgentId, fp.X, fp.Y);
+            SendWorldFeaturePoint(new FeaturePoint(fp.AgentId, worldPoint.x, worldPoint.y));
+        }
+        
+        featurePoints.Clear();
+    }
+
+    private void OnEnable()
+    {
+        NetworkManager.OnFeaturePointsReceived += StoreMessagedReceived;
+    }
+
+    private void OnDisable()
+    {
+        NetworkManager.OnFeaturePointsReceived -= StoreMessagedReceived;
+    }
+
+    private void StoreMessagedReceived(FeaturePoint featurePoint)
+    {
+        featurePoints.Add(featurePoint);
+    }
+
+    private Vector3 Get3DPoint(string agentId, float x, float y)
+    {
+        foreach (KeyValuePair<Camera, Vector3> pair in agentsDict)
+        {
+            Debug.Log(pair.Key.name);
+            if (pair.Key.name != agentId) continue;
+            pair.Key.enabled = true;
+            Vector3 point = pair.Key.ScreenToWorldPoint(new Vector3(x, y, pair.Key.nearClipPlane));
+            pair.Key.enabled = false;
+
+            return point;
+        }
+        
+        return Vector3.zero;
+    }
+
+    private void SendWorldFeaturePoint(FeaturePoint fp)
+    {
+        string newMessage = fp.X + "#" + fp.Y + "#";
+        networkManager.SendMessage(fp.AgentId, 4, newMessage);
     }
 
     private void SpawnCameras(int number)
@@ -103,7 +152,7 @@ public class AgentManager : MonoBehaviour {
         );
     }
 
-    IEnumerator TakeAllScreenshot()
+    private IEnumerator TakeAllScreenshot()
     {
         foreach (KeyValuePair<Camera, Vector3> pair in agentsDict) {
             DisableAllCameras();
@@ -114,6 +163,7 @@ public class AgentManager : MonoBehaviour {
             TakeScreenshot(pair.Key);
         }
 
+        DisableAllCameras();
         networkManager.EndCommunication();
     }
 
@@ -131,4 +181,6 @@ public class AgentManager : MonoBehaviour {
             pair.Key.enabled = false;
         }
     }
+    
+    
 }

@@ -25,6 +25,10 @@ def detect_sift_features(agent, all_agents):
 def image_detect_and_compute(detector, img_name):
     """Detect and compute interest points and their descriptors."""
     img = cv2.imread(img_name)
+    
+    while(img is None):
+        img = cv2.imread(img_name)
+
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     edge_image = cv2.Canny(img,0,50)
 
