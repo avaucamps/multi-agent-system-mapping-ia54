@@ -1,14 +1,16 @@
-﻿public struct FeaturePoint
+﻿using UnityEngine;
+
+public struct FeaturePoint
 {
 	string agentId;
-	float x;
-	float y;
+	private Vector2 worldPoint;
+	private Vector2 screenPoint;
 
-	public FeaturePoint(string agentId, float x, float y)
+	public FeaturePoint(string agentId, Vector2 worldPoint, Vector2 screenPoint)
 	{
 		this.agentId = agentId;
-		this.x = x;
-		this.y = y;
+		this.worldPoint = worldPoint;
+		this.screenPoint = screenPoint;
 	}
 
 	public string AgentId
@@ -16,13 +18,13 @@
 		get { return agentId; }
 	}
 
-	public float X
+	public Vector2 WorldPoint
 	{
-		get { return x; }
+		get { return worldPoint; }
 	}
 
-	public float Y
+	public Vector2 ScreenPoint
 	{
-		get { return y; }
+		get { return screenPoint; }
 	}
 }

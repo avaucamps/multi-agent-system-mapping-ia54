@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using Random = UnityEngine.Random;
 
-public class AgentManager : MonoBehaviour {
-
+public class AgentManager : MonoBehaviour
+{
     public Camera agent;
     public Vector3 positionModel;
     public Vector3 scaleModel;
@@ -17,12 +19,21 @@ public class AgentManager : MonoBehaviour {
     private string directoryPath = "";
     private NetworkManager networkManager;
     private List<FeaturePoint> featurePoints = new List<FeaturePoint>();
+    private bool shouldSendWorldFeaturePoints = false;
 
-    void Start () {
+    private enum MessageType : int
+    {
+        sendNewAgent = 1,
+        sendAgentPosition = 2,
+        sendAgentScreenshot = 3,
+        sendWorldFeaturePoint = 4
+    }
+
+    void Start()
+    {
         networkManager = NetworkManager.Instance;
 
         directoryPath = "Session_" + System.DateTime.Now.ToString("dd-MM-yyyy_HH-mmss");
-
         if (isScreenshotEnabled)
         {
             Directory.CreateDirectory(directoryPath);
@@ -37,25 +48,24 @@ public class AgentManager : MonoBehaviour {
         }
     }
 
-    void Update()
+    private void Update()
     {
-        foreach (FeaturePoint fp in featurePoints)
+        if (shouldSendWorldFeaturePoints)
         {
-            Vector3 worldPoint = Get3DPoint(fp.AgentId, fp.X, fp.Y);
-            SendWorldFeaturePoint(new FeaturePoint(fp.AgentId, worldPoint.x, worldPoint.y));
+            SendAllWorldFeaturePoints();
         }
-        
-        featurePoints.Clear();
     }
 
     private void OnEnable()
     {
-        NetworkManager.OnFeaturePointsReceived += StoreMessagedReceived;
+        NetworkManager.OnFeaturePointReceived += StoreMessagedReceived;
+        NetworkManager.OnAllFeaturePointsReceived += ShouldSendWorldFeaturePoints;
     }
 
     private void OnDisable()
     {
-        NetworkManager.OnFeaturePointsReceived -= StoreMessagedReceived;
+        NetworkManager.OnFeaturePointReceived -= StoreMessagedReceived;
+        NetworkManager.OnAllFeaturePointsReceived -= ShouldSendWorldFeaturePoints;
     }
 
     private void StoreMessagedReceived(FeaturePoint featurePoint)
@@ -63,26 +73,44 @@ public class AgentManager : MonoBehaviour {
         featurePoints.Add(featurePoint);
     }
 
-    private Vector3 Get3DPoint(string agentId, float x, float y)
+    private void ShouldSendWorldFeaturePoints()
+    {
+        shouldSendWorldFeaturePoints = true;
+    }
+
+    private Vector3 Get3DPoint(string agentId, Vector2 screenPoint)
     {
         foreach (KeyValuePair<Camera, Vector3> pair in agentsDict)
         {
-            Debug.Log(pair.Key.name);
             if (pair.Key.name != agentId) continue;
             pair.Key.enabled = true;
-            Vector3 point = pair.Key.ScreenToWorldPoint(new Vector3(x, y, pair.Key.nearClipPlane));
+            Vector3 point = pair.Key.ScreenToWorldPoint(
+                new Vector3(screenPoint.x, screenPoint.y, pair.Key.nearClipPlane)
+            );
             pair.Key.enabled = false;
 
             return point;
         }
-        
+
         return Vector3.zero;
     }
 
-    private void SendWorldFeaturePoint(FeaturePoint fp)
+    private void SendAllWorldFeaturePoints()
     {
-        string newMessage = fp.X + "#" + fp.Y + "#";
-        networkManager.SendMessage(fp.AgentId, 4, newMessage);
+        shouldSendWorldFeaturePoints = false;
+        foreach (FeaturePoint fp in featurePoints)
+        {
+            Vector3 worldPoint = Get3DPoint(fp.AgentId, fp.ScreenPoint);
+            string newMessage = fp.ScreenPoint.x + "#" + fp.ScreenPoint.y + "#";
+            newMessage += worldPoint.x + "#" + worldPoint.y + "#";
+            networkManager.SendMessage(
+                (int) MessageType.sendWorldFeaturePoint,
+                fp.AgentId, 
+                newMessage
+             );
+        }
+
+        featurePoints.Clear();
     }
 
     private void SpawnCameras(int number)
@@ -154,12 +182,21 @@ public class AgentManager : MonoBehaviour {
 
     private IEnumerator TakeAllScreenshot()
     {
-        foreach (KeyValuePair<Camera, Vector3> pair in agentsDict) {
+        foreach (KeyValuePair<Camera, Vector3> pair in agentsDict)
+        {
             DisableAllCameras();
             pair.Key.enabled = true;
             yield return new WaitForEndOfFrame();
-            networkManager.SendSpawnMessage(1, pair.Key.GetInstanceID().ToString());
-            networkManager.SendMessage(pair.Key.GetInstanceID().ToString(), 2, pair.Value.ToString());
+            networkManager.SendMessage(
+                (int) MessageType.sendNewAgent, 
+                pair.Key.GetInstanceID().ToString(),
+                null
+            );
+            networkManager.SendMessage(
+                (int) MessageType.sendAgentPosition,
+                pair.Key.GetInstanceID().ToString(), 
+                pair.Value.ToString()
+            );
             TakeScreenshot(pair.Key);
         }
 
@@ -171,7 +208,11 @@ public class AgentManager : MonoBehaviour {
     {
         string filename = directoryPath + "\\" + agent.GetInstanceID().ToString() + ".png";
         ScreenCapture.CaptureScreenshot(filename);
-        networkManager.SendMessage(agent.GetInstanceID().ToString(), 3, filename);
+        networkManager.SendMessage(
+            (int) MessageType.sendAgentScreenshot, 
+            agent.GetInstanceID().ToString(), 
+            filename
+        );
     }
 
     private void DisableAllCameras()
@@ -181,6 +222,4 @@ public class AgentManager : MonoBehaviour {
             pair.Key.enabled = false;
         }
     }
-    
-    
 }

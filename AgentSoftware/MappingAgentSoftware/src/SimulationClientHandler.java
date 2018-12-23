@@ -130,33 +130,49 @@ public class SimulationClientHandler extends ClientHandler {
                 break;
             case 3: // Agent took screenshot
                 handleAgentTookScreenshot(bytes);
+            case 4:
+                handleAgentWorldFeaturePoint(bytes);
             default:
                 break;
         }
     }
 
     private void handleAgentSpawned(byte[] bytes) {
-        String agentId = new String(bytes, StandardCharsets.UTF_8);
-        action.agentSpawned(agentId);
+        String fullMessage = new String(bytes, StandardCharsets.UTF_8);
+        String[] splitMessage = fullMessage.split("#");
+        action.agentSpawned(splitMessage[1]);
     }
 
     private void handleAgentMoved(byte[] bytes) {
         String fullMessage = new String(bytes, StandardCharsets.UTF_8);
-        String[] splittedMessage = fullMessage.split("#");
-        String agentId = splittedMessage[1];
+        String[] splitMessage = fullMessage.split("#");
+        String agentId = splitMessage[1];
 
         action.agentMoved(
                 agentId,
-                extractPosition(splittedMessage[2])
+                extractPosition(splitMessage[2])
         );
     }
 
     private void handleAgentTookScreenshot(byte[] bytes) {
         String fullMessage = new String(bytes, StandardCharsets.UTF_8);
-        String[] splittedMessage = fullMessage.split("#");
-        String agentId = splittedMessage[1];
-        String filepath = splittedMessage[2];
+        String[] splitMessage = fullMessage.split("#");
+        String agentId = splitMessage[1];
+        String filepath = splitMessage[2];
         action.agentTookScreenshot(agentId, filepath);
+    }
+
+    private void handleAgentWorldFeaturePoint(byte[] bytes) {
+        String fullMessage = new String(bytes, StandardCharsets.UTF_8);
+        String[] splitMessage = fullMessage.split("#");
+        String agentId = splitMessage[1];
+        double screenX = Double.parseDouble(splitMessage[2]);
+        double screenY = Double.parseDouble(splitMessage[3]);
+        double worldX = Double.parseDouble(splitMessage[4]);
+        double worldY = Double.parseDouble(splitMessage[5]);
+        Vector3 worldPoint = new Vector3(screenX, screenY, 0);
+        Vector3 screenPoint = new Vector3(worldX, worldY, 0);
+        action.agentWorldFeaturePoint(agentId, worldPoint, screenPoint);
     }
 
     private Vector3 extractPosition(String position) {

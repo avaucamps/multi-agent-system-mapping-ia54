@@ -30,6 +30,11 @@ public class main {
 			public void received2DMatchPoints(ArrayList<MatchingPoint> matchingPoints) {
 				environment.received2DMatchPoints(matchingPoints);
 			}
+
+			@Override
+			public void agentWorldFeaturePoint(String id, Vector3 worldPoint, Vector3 screenPoint) {
+				environment.agentWorldFeaturePoint(id, worldPoint, screenPoint);
+			}
 		};
 
 		Server serverImageProcessing = new Server(9992, Server.ClientType.imageProcessing, action);

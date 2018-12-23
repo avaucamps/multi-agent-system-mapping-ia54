@@ -9,6 +9,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
+using System.Xml;
+using JetBrains.Annotations;
 
 public class NetworkManager : MonoBehaviour
 {
@@ -23,7 +25,9 @@ public class NetworkManager : MonoBehaviour
     private const string doneString = "Done";
 
     public delegate void ReceiveMessageAction(FeaturePoint featurePoint);
-    public static event ReceiveMessageAction OnFeaturePointsReceived;
+    public static event ReceiveMessageAction OnFeaturePointReceived;
+    public delegate void AllMessageReceivedAction();
+    public static event AllMessageReceivedAction OnAllFeaturePointsReceived;
     
     # region Singleton
 
@@ -41,14 +45,15 @@ public class NetworkManager : MonoBehaviour
         StartConnection();
     }
 
-    public void SendSpawnMessage(int messageType, string message)
+    public void SendMessage(int messageType, string agentId, [CanBeNull] string message)
     {
-        WriteSocket(messageType, message);
-    }
+        string newMessage = "#" + agentId + "#";
 
-    public void SendMessage(string agentId, int messageType, string message)
-    {
-        string newMessage = "#" + agentId + "#" + message;
+        if (message != null)
+        {
+            newMessage += message;
+        }
+        
         WriteSocket(messageType, newMessage);
     }
 
@@ -109,18 +114,33 @@ public class NetworkManager : MonoBehaviour
         string[] messages = allMessages.Split(new string[] { "##" }, StringSplitOptions.None);
         foreach (string message in messages)
         {
-            string[] splitString = message.Split('#');
-            string agentId = splitString[1];
-            float x = float.Parse(splitString[2]);
-            float y = float.Parse(splitString[3]);
+            string[] splitString = Array.ConvertAll(message.Split('#'), p => p.Trim());
+            
+            string agentId = splitString[0];
+            float x = float.Parse(splitString[1]);
+            float y = float.Parse(splitString[2]);
 
-            OnFeaturePointsReceived(
-                new FeaturePoint(agentId, x, y)
+            if (OnFeaturePointReceived == null)
+            {
+                Debug.Log("Cannot look for world points. Reference missing.");
+                continue;
+            }
+            
+            OnFeaturePointReceived(
+                new FeaturePoint(agentId, Vector2.zero, new Vector2(x, y))
             );
         }
+
+        if (OnAllFeaturePointsReceived == null)
+        {
+            Debug.Log("Cannot look for world points. Reference missing.");
+            return;
+        }
+
+        OnAllFeaturePointsReceived();
     }
 
-    private void WriteSocket(int messageType, string theLine)
+    private void WriteSocket(int messageType, string message)
     {
         if (socketConnection == null)
         {
@@ -131,7 +151,7 @@ public class NetworkManager : MonoBehaviour
         String stx = "\x02";
         String etx = "\x03";
         String eot = "\x04";
-        String foo = sth + messageType.ToString() + stx + theLine + etx + eot;
+        String foo = sth + messageType.ToString() + stx + message + etx + eot;
 
         byte[] b = System.Text.Encoding.UTF8.GetBytes(foo);
         string unicode = System.Text.Encoding.UTF8.GetString(b);
@@ -139,5 +159,6 @@ public class NetworkManager : MonoBehaviour
         writer.Write(buffer);
 
         writer.Flush();
+        Debug.Log("Sent message: " + message);
     }
 }

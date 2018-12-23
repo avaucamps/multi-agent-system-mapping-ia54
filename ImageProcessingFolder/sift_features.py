@@ -4,6 +4,7 @@ import cv2
 import matplotlib.pyplot as plt
 import os
 from matching_point import MatchingPoint
+import time
 
 def detect_sift_features(agent, all_agents):
     neighbors_id = agent.get_neighbors_id()
@@ -26,15 +27,20 @@ def image_detect_and_compute(detector, img_name):
     """Detect and compute interest points and their descriptors."""
     img = cv2.imread(img_name)
     
-    while(img is None):
+    if img is None:
+        print("Image could not be loaded. Trying again in 2 seconds.")
+        time.sleep(2)
+
         img = cv2.imread(img_name)
+        if img is None:
+            print("Image could still not be loaded.")
+            return None, None, None
 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     edge_image = cv2.Canny(img,0,50)
 
     kp, des = detector.detectAndCompute(edge_image, None)
     return img, kp, des
-    
 
 def get_image_matches(detector, agent1, agent2, nmatches=5):
     img1_name = agent1.get_image_path()

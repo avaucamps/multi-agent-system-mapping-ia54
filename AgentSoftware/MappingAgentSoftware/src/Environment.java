@@ -73,6 +73,10 @@ public class Environment {
 		setAgents2DMatchPoints(matchPoints);
 	}
 
+	public void agentWorldFeaturePoint(String id, Vector3 worldPoint, Vector3 screenPoint) {
+
+	}
+
 	private void setAgentsInformation(ArrayList<String> information) {
 		support.firePropertyChange(
 				PropertyChangeConstants.IMAGE_PROCESSING_MESSAGE_NAME,
