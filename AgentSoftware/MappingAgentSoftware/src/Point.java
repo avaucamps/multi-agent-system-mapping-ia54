@@ -14,4 +14,11 @@ public class Point {
     public double getY() {
         return y;
     }
+
+    public Point subtract(Point other) {
+        return new Point(
+                x - other.getX(),
+                y - other.getY()
+        );
+    }
 }

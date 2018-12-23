@@ -170,8 +170,8 @@ public class SimulationClientHandler extends ClientHandler {
         double screenY = Double.parseDouble(splitMessage[3]);
         double worldX = Double.parseDouble(splitMessage[4]);
         double worldY = Double.parseDouble(splitMessage[5]);
-        Vector3 worldPoint = new Vector3(screenX, screenY, 0);
-        Vector3 screenPoint = new Vector3(worldX, worldY, 0);
+        Point worldPoint = new Point(screenX, screenY);
+        Point screenPoint = new Point(worldX, worldY);
         action.agentWorldFeaturePoint(agentId, worldPoint, screenPoint);
     }
 

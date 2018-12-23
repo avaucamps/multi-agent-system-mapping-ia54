@@ -1,5 +1,6 @@
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -10,11 +11,15 @@ public class Environment {
 	private ArrayList<MatchingPoint> matchPoints2D;
 	private PropertyChangeSupport support;
 	private HashMap<Agent, Vector3> agents = new HashMap<Agent, Vector3>();
+	private ArrayList<Point> featurePoints;
+	private EnvironmentUpdate envUpdate;
 	private final int numberOfNeighbors = 3;
 	
-	public Environment() {
+	public Environment(EnvironmentUpdate envUpdate) {
+		this.envUpdate = envUpdate;
 		agentsInformation = new ArrayList<String>();
 		matchPoints2D = new ArrayList<MatchingPoint>();
+		featurePoints = new ArrayList<Point>();
 		support = new PropertyChangeSupport(this);
 	}
 
@@ -73,8 +78,19 @@ public class Environment {
 		setAgents2DMatchPoints(matchPoints);
 	}
 
-	public void agentWorldFeaturePoint(String id, Vector3 worldPoint, Vector3 screenPoint) {
+	public void agentWorldFeaturePoint(String id, Point worldPoint, Point screenPoint) {
+		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
+			if (entry.getKey().getId().equals(id)) {
+				Point agentPosition = new Point(entry.getValue().getX(), entry.getValue().getY());
+				Point pointForAgent = worldPoint.subtract(agentPosition);
+				entry.getKey().addFeaturePoint(pointForAgent);
+				featurePoints.add(worldPoint);
+			}
+		}
+	}
 
+	public void allWorldFeaturePointsReceived() {
+		envUpdate.mapEnvironment(featurePoints);
 	}
 
 	private void setAgentsInformation(ArrayList<String> information) {
