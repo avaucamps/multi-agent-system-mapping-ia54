@@ -84,9 +84,8 @@ public class AgentManager : MonoBehaviour
         {
             if (pair.Key.name != agentId) continue;
             pair.Key.enabled = true;
-            Vector3 point = pair.Key.ScreenToWorldPoint(
-                new Vector3(screenPoint.x, screenPoint.y, pair.Key.nearClipPlane)
-            );
+            Ray ray = agent.ScreenPointToRay(new Vector3(screenPoint.x, screenPoint.y));
+            Vector3 point = ray.origin + (ray.direction * agent.nearClipPlane);
             pair.Key.enabled = false;
 
             return point;
@@ -109,7 +108,8 @@ public class AgentManager : MonoBehaviour
                 newMessage
              );
         }
-
+        
+        networkManager.EndCommunication();
         featurePoints.Clear();
     }
 
@@ -149,7 +149,7 @@ public class AgentManager : MonoBehaviour
         agentInstance2.fieldOfView = 70;
         agentInstance2.enabled = false;
         agentInstance2.transform.rotation = Quaternion.Euler(-90, 0, 0);
-        agentInstance2.name = agentInstance.GetInstanceID().ToString();
+        agentInstance2.name = agentInstance2.GetInstanceID().ToString();
         agentsDict.Add(agentInstance2, position2);
 
         Vector3 position3 = new Vector3(2.115f, -0.332f, 5.336f);
@@ -161,7 +161,7 @@ public class AgentManager : MonoBehaviour
         agentInstance3.fieldOfView = 70;
         agentInstance3.enabled = false;
         agentInstance3.transform.rotation = Quaternion.Euler(-90, 0, 0);
-        agentInstance3.name = agentInstance.GetInstanceID().ToString();
+        agentInstance3.name = agentInstance3.GetInstanceID().ToString();
         agentsDict.Add(agentInstance3, position3);
     }
 

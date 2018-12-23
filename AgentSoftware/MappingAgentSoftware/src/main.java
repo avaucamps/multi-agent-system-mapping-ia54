@@ -5,16 +5,7 @@ public class main {
 	private static MapDisplay mapDisplay;
 
 	public static void main(String[] args) {
-
-		ArrayList<Point> points = new ArrayList<>();
-		points.add(new Point(10,5));
-		points.add(new Point(-3,2));
-		points.add(new Point(-5,-2));
-		points.add(new Point(7,3));
-		points.add(new Point(3,3));
-
-		mapDisplay = new MapDisplay(points);
-		/*EnvironmentUpdate envUpdate = new EnvironmentUpdate() {
+		EnvironmentUpdate envUpdate = new EnvironmentUpdate() {
 			@Override
 			public void mapEnvironment(ArrayList<Point> points) {
 				mapDisplay = new MapDisplay(points);
@@ -64,6 +55,6 @@ public class main {
 		Server serverSimulation = new Server(9991, Server.ClientType.simulation, action);
 
 		environment.addPropertyChangeListener(serverImageProcessing.getClientHandler());
-		environment.addPropertyChangeListener(serverSimulation.getClientHandler());*/
+		environment.addPropertyChangeListener(serverSimulation.getClientHandler());
 	}
 }

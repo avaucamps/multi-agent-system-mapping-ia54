@@ -42,6 +42,7 @@ public class SimulationClientHandler extends ClientHandler {
             boolean startOfText = false;
             boolean endOfText = false;
             boolean endOfTransmission = false;
+            boolean allScreenshotDone = false;
             int messageType = -1;
 
             while(!done) {
@@ -49,7 +50,13 @@ public class SimulationClientHandler extends ClientHandler {
 
                 if (b == 0) {
                     //done = true;
-                    action.allScreenshotsDone();
+                    if (!allScreenshotDone) {
+                        action.allScreenshotsDone();
+                        allScreenshotDone = true;
+                    } else {
+                        action.allWorldFeaturePointsReceived();
+                    }
+
                     continue;
                 }
 
@@ -88,7 +95,7 @@ public class SimulationClientHandler extends ClientHandler {
                     for (int i = 0; i < bytes.size(); i++) {
                         bytesArray[i] = bytes.get(i).byteValue();
                     }
-                    showMessage(bytesArray, messageType);
+                    //showMessage(bytesArray, messageType);
                     handleAction(messageType, bytesArray);
 
                     startOfHeading = false;
@@ -130,8 +137,10 @@ public class SimulationClientHandler extends ClientHandler {
                 break;
             case 3: // Agent took screenshot
                 handleAgentTookScreenshot(bytes);
+                break;
             case 4:
                 handleAgentWorldFeaturePoint(bytes);
+                break;
             default:
                 break;
         }
@@ -166,12 +175,13 @@ public class SimulationClientHandler extends ClientHandler {
         String fullMessage = new String(bytes, StandardCharsets.UTF_8);
         String[] splitMessage = fullMessage.split("#");
         String agentId = splitMessage[1];
-        double screenX = Double.parseDouble(splitMessage[2]);
-        double screenY = Double.parseDouble(splitMessage[3]);
-        double worldX = Double.parseDouble(splitMessage[4]);
-        double worldY = Double.parseDouble(splitMessage[5]);
+        double screenX = Double.parseDouble(splitMessage[4]);
+        double screenY = Double.parseDouble(splitMessage[5]);
+        double worldX = Double.parseDouble(splitMessage[2]);
+        double worldY = Double.parseDouble(splitMessage[3]);
         Point worldPoint = new Point(screenX, screenY);
         Point screenPoint = new Point(worldX, worldY);
+        System.out.println("World point received: " + worldX + ", " + worldY);
         action.agentWorldFeaturePoint(agentId, worldPoint, screenPoint);
     }
 
