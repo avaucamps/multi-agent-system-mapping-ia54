@@ -124,7 +124,6 @@ public class SimulationClientHandler extends ClientHandler {
         System.out.println("Message type : " + messageType);
         String message = new String(bytes, StandardCharsets.UTF_8);
         System.out.println(message);
-
     }
 
     private void handleAction(int messageType, byte[] bytes) {
@@ -175,14 +174,18 @@ public class SimulationClientHandler extends ClientHandler {
         String fullMessage = new String(bytes, StandardCharsets.UTF_8);
         String[] splitMessage = fullMessage.split("#");
         String agentId = splitMessage[1];
-        double screenX = Double.parseDouble(splitMessage[4]);
-        double screenY = Double.parseDouble(splitMessage[5]);
-        double worldX = Double.parseDouble(splitMessage[2]);
-        double worldY = Double.parseDouble(splitMessage[3]);
+        String featureMatchingType = splitMessage[2];
+        double screenX = Double.parseDouble(splitMessage[5]);
+        double screenY = Double.parseDouble(splitMessage[6]);
+        double worldX = Double.parseDouble(splitMessage[3]);
+        double worldY = Double.parseDouble(splitMessage[4]);
         Point worldPoint = new Point(screenX, screenY);
         Point screenPoint = new Point(worldX, worldY);
-        System.out.println("World point received: " + worldX + ", " + worldY);
-        action.agentWorldFeaturePoint(agentId, worldPoint, screenPoint);
+        System.out.println("World point received: " + worldX + ", " + worldY + ", " + featureMatchingType);
+
+        FeatureMatchingType type = featureMatchingType.equals(FeatureMatchingType.sift.toString()) ?
+                FeatureMatchingType.sift : FeatureMatchingType.harris;
+        action.agentWorldFeaturePoint(agentId, worldPoint, screenPoint, type);
     }
 
     private Vector3 extractPosition(String position) {
@@ -199,6 +202,8 @@ public class SimulationClientHandler extends ClientHandler {
 
     private String buildMessage(MatchingPoint matchingPoint) {
         String message = "";
+        message += "#";
+        message += matchingPoint.getFeatureMatchingType().toString();
         message += "#";
         message += matchingPoint.getAgent1Id();
         message += "#";

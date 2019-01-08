@@ -3,12 +3,14 @@ public class MatchingPoint {
     private Point pointAgent1;
     private String agent2Id;
     private Point pointAgent2;
+    private FeatureMatchingType featureMatchingType;
 
-    public MatchingPoint(String agent1Id, String agent2Id, Point p1, Point p2) {
+    public MatchingPoint(String agent1Id, String agent2Id, Point p1, Point p2, FeatureMatchingType featureMatchingType) {
         this.agent1Id = agent1Id;
         this.pointAgent1 = p1;
         this.agent2Id = agent2Id;
         this.pointAgent2 = p2;
+        this.featureMatchingType = featureMatchingType;
 
         System.out.println("[" + agent1Id + "]New matching point added.");
     }
@@ -27,5 +29,9 @@ public class MatchingPoint {
 
     public Point getPointAgent2() {
         return pointAgent2;
+    }
+
+    public FeatureMatchingType getFeatureMatchingType() {
+        return featureMatchingType;
     }
 }

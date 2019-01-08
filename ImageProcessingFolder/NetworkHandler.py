@@ -28,13 +28,43 @@ class NetworkHandler:
             else:
                 self.messages.append(string_data)
 
-    def send_match_points(self, match_points):
+    def send_match_points_sift(self, match_points):
         #agent1#agent2#x1#y1#x2#y2
         startText = '\x01'
         endText = '\x04'
 
         for match_point in match_points:
             match_point_message = '#'
+            match_point_message += "SIFT"
+            match_point_message += "#"
+            match_point_message += match_point.get_agent1_id()
+            match_point_message += '#'
+            match_point_message += match_point.get_agent2_id()
+            match_point_message += '#'
+            match_point_message += str(match_point.get_x1())
+            match_point_message += '#'
+            match_point_message += str(match_point.get_y1())
+            match_point_message += '#'
+            match_point_message += str(match_point.get_x2())
+            match_point_message += '#'
+            match_point_message += str(match_point.get_y2())
+            match_point_message += '#'
+
+            self.client_socket.send(str(startText).encode())
+            self.client_socket.send(match_point_message.encode())
+            self.client_socket.send(str(endText).encode())
+
+        self.client_socket.send("\x00".encode())
+
+    def send_match_points_harris(self, match_points):
+        #agent1#agent2#x1#y1#x2#y2
+        startText = '\x01'
+        endText = '\x04'
+
+        for match_point in match_points:
+            match_point_message = '#'
+            match_point_message += "HARRIS"
+            match_point_message += "#"
             match_point_message += match_point.get_agent1_id()
             match_point_message += '#'
             match_point_message += match_point.get_agent2_id()

@@ -1,14 +1,16 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class main {
 
-	private static MapDisplay mapDisplay;
+	private static MapDisplay mapDisplaySift;
+	private static MapDisplay mapDisplayHarris;
 
 	public static void main(String[] args) {
 		EnvironmentUpdate envUpdate = new EnvironmentUpdate() {
 			@Override
-			public void mapEnvironment(ArrayList<Point> points) {
-				mapDisplay = new MapDisplay(points);
+			public void mapEnvironment(ArrayList<Point> points, FeatureMatchingType type) {
+				mapDisplaySift = new MapDisplay(points, type);
 			}
 		};
 
@@ -41,8 +43,8 @@ public class main {
 			}
 
 			@Override
-			public void agentWorldFeaturePoint(String id, Point worldPoint, Point screenPoint) {
-				environment.agentWorldFeaturePoint(id, worldPoint, screenPoint);
+			public void agentWorldFeaturePoint(String id, Point worldPoint, Point screenPoint, FeatureMatchingType type) {
+				environment.agentWorldFeaturePoint(id, worldPoint, screenPoint, type);
 			}
 
 			@Override

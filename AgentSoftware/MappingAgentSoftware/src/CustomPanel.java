@@ -13,7 +13,7 @@ public class CustomPanel extends Panel {
     public void paint(Graphics g) {
         g.setColor(Color.black);
         for (Point p: points) {
-            g.fillOval((int) p.getX(), (int) p.getY(),10,10);
+            g.fillOval((int) p.getX(), (int) p.getY(),5,5);
         }
     }
 
@@ -24,8 +24,8 @@ public class CustomPanel extends Panel {
         int heightCenter = getHeight() / 2;
 
         for (Point p: points) {
-            double x = widthCenter + (p.getX() * 10);
-            double y = heightCenter - (p.getY() * 10);
+            double x = widthCenter + (p.getX() * 50);
+            double y = heightCenter - (p.getY() * 50);
             updatedPoints.add(
                     new Point(x, y)
             );

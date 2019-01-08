@@ -6,6 +6,6 @@ public interface Action {
 	void agentTookScreenshot(String id, String filepath);
 	void allScreenshotsDone();
 	void received2DMatchPoints(ArrayList<MatchingPoint> matchingPoint);
-	void agentWorldFeaturePoint(String id, Point worldPoint, Point screenPoint);
+	void agentWorldFeaturePoint(String id, Point worldPoint, Point screenPoint, FeatureMatchingType type);
 	void allWorldFeaturePointsReceived();
 }

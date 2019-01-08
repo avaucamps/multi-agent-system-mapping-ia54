@@ -11,7 +11,8 @@ public class Environment {
 	private ArrayList<MatchingPoint> matchPoints2D;
 	private PropertyChangeSupport support;
 	private HashMap<Agent, Vector3> agents = new HashMap<Agent, Vector3>();
-	private ArrayList<Point> featurePoints;
+	private ArrayList<Point> featurePointsSift;
+	private ArrayList<Point> featurePointsHarris;
 	private EnvironmentUpdate envUpdate;
 	private final int numberOfNeighbors = 3;
 	
@@ -19,7 +20,8 @@ public class Environment {
 		this.envUpdate = envUpdate;
 		agentsInformation = new ArrayList<String>();
 		matchPoints2D = new ArrayList<MatchingPoint>();
-		featurePoints = new ArrayList<Point>();
+		featurePointsSift = new ArrayList<Point>();
+		featurePointsHarris = new ArrayList<>();
 		support = new PropertyChangeSupport(this);
 	}
 
@@ -78,19 +80,28 @@ public class Environment {
 		setAgents2DMatchPoints(matchPoints);
 	}
 
-	public void agentWorldFeaturePoint(String id, Point worldPoint, Point screenPoint) {
+	public void agentWorldFeaturePoint(String id, Point worldPoint, Point screenPoint, FeatureMatchingType type) {
 		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
 			if (entry.getKey().getId().equals(id)) {
 				Point agentPosition = new Point(entry.getValue().getX(), entry.getValue().getY());
 				Point pointForAgent = worldPoint.subtract(agentPosition);
 				entry.getKey().addFeaturePoint(pointForAgent);
-				featurePoints.add(worldPoint);
+
+				switch (type) {
+					case sift:
+						featurePointsSift.add(worldPoint);
+						break;
+					case harris:
+						featurePointsHarris.add(worldPoint);
+						break;
+				}
 			}
 		}
 	}
 
 	public void allWorldFeaturePointsReceived() {
-		envUpdate.mapEnvironment(featurePoints);
+		envUpdate.mapEnvironment(featurePointsSift, FeatureMatchingType.sift);
+		envUpdate.mapEnvironment(featurePointsHarris, FeatureMatchingType.harris);
 	}
 
 	private void setAgentsInformation(ArrayList<String> information) {

@@ -115,10 +115,14 @@ public class NetworkManager : MonoBehaviour
         foreach (string message in messages)
         {
             string[] splitString = Array.ConvertAll(message.Split('#'), p => p.Trim());
-            
-            string agentId = splitString[0];
-            float x = float.Parse(splitString[1]);
-            float y = float.Parse(splitString[2]);
+            splitString = splitString.Where(n => !string.IsNullOrEmpty(n)).ToArray();
+
+            string featureMatchingType = splitString[0];
+            Debug.Log(featureMatchingType);
+            string agentId = splitString[1];
+            Debug.Log(agentId);
+            float x = float.Parse(splitString[2]);
+            float y = float.Parse(splitString[3]);
 
             if (OnFeaturePointReceived == null)
             {
@@ -127,7 +131,7 @@ public class NetworkManager : MonoBehaviour
             }
             
             OnFeaturePointReceived(
-                new FeaturePoint(agentId, Vector2.zero, new Vector2(x, y))
+                new FeaturePoint(agentId, Vector2.zero, new Vector2(x, y), featureMatchingType)
             );
         }
 

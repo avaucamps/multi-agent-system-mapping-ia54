@@ -8,16 +8,17 @@ public class MapDisplay {
     private JFrame frame;
     private CustomPanel panel;
 
-    public MapDisplay(ArrayList<Point> points) {
+    public MapDisplay(ArrayList<Point> points, FeatureMatchingType type) {
         this.points = points;
         showFrame();
+        frame.setTitle("Detection with " + type.toString() + " features.");
         setPoints();
     }
 
     private void showFrame() {
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600,600);
+        frame.setSize(1000,1000);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(
                 dim.width/2-frame.getSize().width/2,

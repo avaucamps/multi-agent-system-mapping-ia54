@@ -11,3 +11,13 @@ def remove_duplicates_matching_points(matching_points):
             new_match_points.append(match_point)
 
     return new_match_points
+
+def get_neighbors_object(agents, neighbors_id):
+    neighbors = []
+    for neighbor_id in neighbors_id:
+        for a in agents:
+            if a.get_id() == neighbor_id:
+                neighbors.append(a)
+                break
+    
+    return neighbors
