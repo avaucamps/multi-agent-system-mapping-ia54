@@ -22,13 +22,9 @@ public class ImageProcessingClientHandler extends ClientHandler {
             return;
         }
 
-        ArrayList<String> messages = (ArrayList<String>) evt.getNewValue();
-        for(String message: messages) {
-            System.out.println("Message sent to image processing: " + message);
-            sendMessage(message);
-        }
-
-        sendMessage("AllMessagesSent");
+        String message = (String) evt.getNewValue();
+        System.out.println("Message sent to image processing: " + message);
+        sendMessage(message);
     }
 
     @Override

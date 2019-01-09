@@ -7,16 +7,17 @@ import java.util.*;
 
 public class Environment {
 
-	private ArrayList<String> agentsInformation;
 	private ArrayList<MatchingPoint> matchPoints2D;
-	private PropertyChangeSupport support;
 	private HashMap<Agent, Vector3> agents = new HashMap<Agent, Vector3>();
+	private ArrayList<AgentEvent> agentEvents = new ArrayList<>();
 	private EnvironmentUpdate envUpdate;
+	private PropertyChangeSupport support;
+	private int numberOfAgents = 0;
 	private final int numberOfNeighbors = 3;
+	private String message = "";
 	
 	public Environment(EnvironmentUpdate envUpdate) {
 		this.envUpdate = envUpdate;
-		agentsInformation = new ArrayList<String>();
 		matchPoints2D = new ArrayList<MatchingPoint>();
 		support = new PropertyChangeSupport(this);
 	}
@@ -29,11 +30,30 @@ public class Environment {
 		support.removePropertyChangeListener(pcl);
 	}
 
+	public void onNumberOfAgents(int n) {
+		numberOfAgents = n;
+	}
+
 	public void agentSpawned(String id) {
 		agents.put(
-				new Agent(id),
+				new Agent(id, this::onAgentEvent),
 				new Vector3(0,0,0)
 		);
+	}
+
+	public void onAgentEvent(AgentEvent event) {
+		agentEvents.add(event);
+
+		int numberOfCurrentEvent = 0;
+		for(AgentEvent agentEvent : agentEvents) {
+			if (agentEvent.getEventType().equals(event.getEventType())) {
+				numberOfCurrentEvent++;
+			}
+		}
+
+		if (numberOfCurrentEvent == numberOfAgents) {
+			handleAgentEvent(event.getEventType());
+		}
 	}
 
 	public void agentMoved(String id, Vector3 position) {
@@ -53,23 +73,6 @@ public class Environment {
 		agent.ifPresent(a -> {
 			a.setImagePath(filepath);
 		});
-	}
-
-	public void allScreenshotsDone() {
-		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
-			entry.getKey().addNeighbors(
-					AgentUtils.getNeighbors(entry.getKey(), agents, numberOfNeighbors)
-			);
-		}
-
-		ArrayList<String> information = new ArrayList<>();
-		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
-			information.add(
-					AgentUtils.getAgentInformation(entry.getKey())
-			);
-		}
-
-		setAgentsInformation(information);
 	}
 
 	public void received2DMatchPoints(ArrayList<MatchingPoint> matchPoints) {
@@ -93,6 +96,27 @@ public class Environment {
 		envUpdate.mapEnvironment(getAllFeaturePoints(FeatureMatchingType.harris), FeatureMatchingType.harris);
 	}
 
+	private void handleAgentEvent(AgentEvent.Event event) {
+		switch (event) {
+			case askNeighbors:
+				setNeighbors();
+				break;
+			case getMatchingPoints:
+				sendMessagesToImageProcessing(event);
+				break;
+			default:
+				break;
+		}
+	}
+
+	private void setNeighbors() {
+		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
+			entry.getKey().addNeighbors(
+					AgentUtils.getNeighbors(entry.getKey(), agents, numberOfNeighbors)
+			);
+		}
+	}
+
 	private ArrayList<Point> getAllFeaturePoints(FeatureMatchingType type) {
 		ArrayList<Point> points = new ArrayList<>();
 
@@ -107,13 +131,27 @@ public class Environment {
 		return points;
 	}
 
-	private void setAgentsInformation(ArrayList<String> information) {
+	private void sendMessagesToImageProcessing(AgentEvent.Event event) {
+		for(AgentEvent agentEvent : agentEvents) {
+			if (!event.equals(agentEvent.getEventType())) {
+				continue;
+			}
+
+			support.firePropertyChange(
+					PropertyChangeConstants.IMAGE_PROCESSING_MESSAGE_NAME,
+					message,
+					agentEvent.getMessage()
+			);
+			this.message = agentEvent.getMessage();
+		}
+
 		support.firePropertyChange(
 				PropertyChangeConstants.IMAGE_PROCESSING_MESSAGE_NAME,
-				this.agentsInformation,
-				information
+				message,
+				"AllMessagesSent"
 		);
-		this.agentsInformation = information;
+
+		this.message = "AllMessagesSent";
 	}
 
 	private void setAgents2DMatchPoints(ArrayList<MatchingPoint> matchPoints) {

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 
 public class AgentManager : MonoBehaviour
@@ -26,7 +27,8 @@ public class AgentManager : MonoBehaviour
         sendNewAgent = 1,
         sendAgentPosition = 2,
         sendAgentScreenshot = 3,
-        sendWorldFeaturePoint = 4
+        sendWorldFeaturePoint = 4,
+        sendNumberOfAgents = 5,
     }
 
     void Start()
@@ -129,42 +131,6 @@ public class AgentManager : MonoBehaviour
             agentInstance.name = agentInstance.GetInstanceID().ToString();
             agentsDict.Add(agentInstance, position);
         }*/
-        /*Vector3 position = new Vector3(1.455f, -0.332f, 4.611f);
-        Camera agentInstance = Instantiate(
-            agent,
-            position,
-            Quaternion.identity
-        );
-        agentInstance.fieldOfView = 70;
-        agentInstance.enabled = false;
-        agentInstance.transform.rotation = Quaternion.Euler(-90, 0, 0);
-        agentInstance.name = agentInstance.GetInstanceID().ToString();
-        agentsDict.Add(agentInstance, position);
-
-        Vector3 position2 = new Vector3(1.037f, -0.332f, 3.745f);
-        Camera agentInstance2 = Instantiate(
-            agent,
-            position2,
-            Quaternion.identity
-        );
-        agentInstance2.fieldOfView = 70;
-        agentInstance2.enabled = false;
-        agentInstance2.transform.rotation = Quaternion.Euler(-90, 0, 0);
-        agentInstance2.name = agentInstance2.GetInstanceID().ToString();
-        agentsDict.Add(agentInstance2, position2);
-
-        Vector3 position3 = new Vector3(2.115f, -0.332f, 5.336f);
-        Camera agentInstance3 = Instantiate(
-            agent,
-            position3,
-            Quaternion.identity
-        );
-        agentInstance3.fieldOfView = 70;
-        //agentInstance3.enabled = false;
-        agentInstance3.transform.rotation = Quaternion.Euler(-90, 0, 0);
-        agentInstance3.name = agentInstance3.GetInstanceID().ToString();
-        agentsDict.Add(agentInstance3, position3);
-        script2.cam = agentInstance3;*/
         Vector3 position = new Vector3(-2.382f, -0.283f, 18.819f);
         Camera agentInstance = Instantiate(
             agent,
@@ -186,8 +152,8 @@ public class AgentManager : MonoBehaviour
         agentInstance2.transform.rotation = Quaternion.Euler(-90, 0, 0);
         agentInstance2.name = agentInstance2.GetInstanceID().ToString();
         agentsDict.Add(agentInstance2, position2);
-
         
+        networkManager.SendMessage((int) MessageType.sendNumberOfAgents, "2");
     }
 
     private void SetBounds()

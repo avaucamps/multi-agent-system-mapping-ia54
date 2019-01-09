@@ -12,6 +12,7 @@ import time
 from skimage import io
 from utils import get_neighbors_object
 import math
+from skimage.transform import AffineTransform
 
 def detect_harris_features(agent, all_agents):
     neighbors_id = agent.get_neighbors_id()
@@ -32,6 +33,35 @@ def gaussian_weights(window_ext, sigma=1):
     g[:] = np.exp(-0.5 * (x**2 / sigma**2 + y**2 / sigma**2))
     g /= 2 * np.pi * sigma * sigma
     return g
+
+def show_images(src, dst, img_orig_gray, img_warped_gray):
+        # estimate affine transform model using all coordinates
+        model = AffineTransform()
+        model.estimate(src, dst)
+
+        # robustly estimate affine transform model with RANSAC
+        model_robust, inliers = ransac((src, dst), AffineTransform, min_samples=3,
+                                    residual_threshold=2, max_trials=100)
+        outliers = inliers == False
+
+        # visualize correspondence
+        fig, ax = plt.subplots(nrows=2, ncols=1)
+
+        plt.gray()
+
+        inlier_idxs = np.nonzero(inliers)[0]
+        plot_matches(ax[0], img_orig_gray, img_warped_gray, src, dst,
+                    np.column_stack((inlier_idxs, inlier_idxs)), matches_color='b')
+        ax[0].axis('off')
+        ax[0].set_title('Correct correspondences')
+
+        outlier_idxs = np.nonzero(outliers)[0]
+        plot_matches(ax[1], img_orig_gray, img_warped_gray, src, dst,
+                    np.column_stack((outlier_idxs, outlier_idxs)), matches_color='r')
+        ax[1].axis('off')
+        ax[1].set_title('Faulty correspondences')
+
+        plt.show()
 
 def match_corner(img_orig, img_warped, coord, coords_warped, coords_warped_subpix, window_ext=5):
     r, c = np.round(coord).astype(np.intp)
@@ -77,6 +107,8 @@ def get_image_matches(agent1, agent2, nmatches=5):
                                         window_size=9)
 
     matching_points = []
+    src = []
+    dst = []
     for coord in coords_img1_subpix:
         if math.isnan(coord[0]) or math.isnan(coord[1]):
             continue
@@ -86,7 +118,13 @@ def get_image_matches(agent1, agent2, nmatches=5):
         y1 = coord[1]
         x2 = coord_warped[0]
         y2 = coord_warped[1]
+        src.append(coord)
+        dst.append(coord_warped)
         match_point = MatchingPoint(agent1.get_id(), agent2.get_id(), x1, y1, x2, y2)
         matching_points.append(match_point)
+
+    src = np.array(src)
+    dst = np.array(dst)
+    #show_images(src, dst, img1_gray, img2_gray)
 
     return matching_points

@@ -23,6 +23,7 @@ public class NetworkManager : MonoBehaviour
     private const String host = "localhost";
     private const Int32 port = 9991;
     private const string doneString = "Done";
+    private Dictionary<string, int> messagesQueue = new Dictionary<string, int>();
 
     public delegate void ReceiveMessageAction(FeaturePoint featurePoint);
     public static event ReceiveMessageAction OnFeaturePointReceived;
@@ -57,6 +58,11 @@ public class NetworkManager : MonoBehaviour
         WriteSocket(messageType, newMessage);
     }
 
+    public void SendMessage(int messageType, string message)
+    {
+        WriteSocket(messageType, "#" + message);
+    }
+
     public void EndCommunication()
     {
         if (socketConnection == null)
@@ -74,6 +80,14 @@ public class NetworkManager : MonoBehaviour
             clientThread = new Thread(Listen);
             clientThread.IsBackground = true;
             clientThread.Start();
+
+            var messagesToSend = new Dictionary<string, int>(messagesQueue);
+            Debug.Log(messagesToSend.Count);
+            messagesQueue.Clear();
+            foreach(KeyValuePair<string, int> pair in messagesToSend)
+            {
+                WriteSocket(pair.Value, pair.Key);
+            }
         }
         catch (Exception e)
         {
@@ -148,6 +162,7 @@ public class NetworkManager : MonoBehaviour
     {
         if (socketConnection == null)
         {
+            messagesQueue[message] = messageType;
             return;
         }
         

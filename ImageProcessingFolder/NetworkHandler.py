@@ -5,7 +5,6 @@ class NetworkHandler:
 
     def __init__(self, agents_received):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.messages = []
         self.agents = []
         self.agents_received = agents_received
         self.open_connection()
@@ -22,11 +21,10 @@ class NetworkHandler:
                 self.close_connection()
                 done = True
             elif (string_data == 'AllMessagesSent'):
-                self.extract_messages_data()
                 self.agents_received(self.agents, self)
                 done = True
             else:
-                self.messages.append(string_data)
+                self.extract_message_data(string_data)
 
     def send_match_points_sift(self, match_points):
         #agent1#agent2#x1#y1#x2#y2
@@ -87,9 +85,8 @@ class NetworkHandler:
     def close_connection(self):
         self.client_socket.close()
 
-    def extract_messages_data(self):
-        for message in self.messages:
-            self.process_agent_message(message)
+    def extract_message_data(self, message):
+        self.process_agent_message(message)
 
     def process_agent_message(self, message):
         #agentid#image_path#neighbor1id#neighbor2id#neighbor3id#

@@ -18,6 +18,9 @@ public class main {
 
 		Action action = new Action() {
 			@Override
+			public void onNumberOfAgents(int n) { environment.onNumberOfAgents(n); }
+
+			@Override
 			public void agentSpawned(String id) {
 				environment.agentSpawned(id);
 			}
@@ -30,11 +33,6 @@ public class main {
 			@Override
 			public void agentTookScreenshot(String id, String filepath) {
 				environment.agentTookScreenshot(id, filepath);
-			}
-
-			@Override
-			public void allScreenshotsDone() {
-				environment.allScreenshotsDone();
 			}
 
 			@Override

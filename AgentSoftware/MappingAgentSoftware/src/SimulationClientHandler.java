@@ -51,7 +51,6 @@ public class SimulationClientHandler extends ClientHandler {
                 if (b == 0) {
                     //done = true;
                     if (!allScreenshotDone) {
-                        action.allScreenshotsDone();
                         allScreenshotDone = true;
                     } else {
                         action.allWorldFeaturePointsReceived();
@@ -140,6 +139,9 @@ public class SimulationClientHandler extends ClientHandler {
             case 4:
                 handleAgentWorldFeaturePoint(bytes);
                 break;
+            case 5:
+                handleNumberOfAgents(bytes);
+                break;
             default:
                 break;
         }
@@ -186,6 +188,13 @@ public class SimulationClientHandler extends ClientHandler {
         FeatureMatchingType type = featureMatchingType.equals(FeatureMatchingType.sift.toString()) ?
                 FeatureMatchingType.sift : FeatureMatchingType.harris;
         action.agentWorldFeaturePoint(agentId, worldPoint, screenPoint, type);
+    }
+
+    private void handleNumberOfAgents(byte[] bytes) {
+        String fullMessage = new String(bytes, StandardCharsets.UTF_8);
+        String[] splitMessage = fullMessage.split("#");
+
+        action.onNumberOfAgents(Integer.parseInt(splitMessage[1]));
     }
 
     private Vector3 extractPosition(String position) {
