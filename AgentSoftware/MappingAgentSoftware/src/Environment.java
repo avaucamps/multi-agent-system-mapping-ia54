@@ -11,8 +11,6 @@ public class Environment {
 	private ArrayList<MatchingPoint> matchPoints2D;
 	private PropertyChangeSupport support;
 	private HashMap<Agent, Vector3> agents = new HashMap<Agent, Vector3>();
-	private ArrayList<Point> featurePointsSift;
-	private ArrayList<Point> featurePointsHarris;
 	private EnvironmentUpdate envUpdate;
 	private final int numberOfNeighbors = 3;
 	
@@ -20,8 +18,6 @@ public class Environment {
 		this.envUpdate = envUpdate;
 		agentsInformation = new ArrayList<String>();
 		matchPoints2D = new ArrayList<MatchingPoint>();
-		featurePointsSift = new ArrayList<Point>();
-		featurePointsHarris = new ArrayList<>();
 		support = new PropertyChangeSupport(this);
 	}
 
@@ -85,23 +81,30 @@ public class Environment {
 			if (entry.getKey().getId().equals(id)) {
 				Point agentPosition = new Point(entry.getValue().getX(), entry.getValue().getY());
 				Point pointForAgent = worldPoint.subtract(agentPosition);
-				entry.getKey().addFeaturePoint(pointForAgent);
-
-				switch (type) {
-					case sift:
-						featurePointsSift.add(worldPoint);
-						break;
-					case harris:
-						featurePointsHarris.add(worldPoint);
-						break;
-				}
+				entry.getKey().addFeaturePoint(
+						new FeaturePoint(pointForAgent, type)
+				);
 			}
 		}
 	}
 
 	public void allWorldFeaturePointsReceived() {
-		envUpdate.mapEnvironment(featurePointsSift, FeatureMatchingType.sift);
-		envUpdate.mapEnvironment(featurePointsHarris, FeatureMatchingType.harris);
+		envUpdate.mapEnvironment(getAllFeaturePoints(FeatureMatchingType.sift), FeatureMatchingType.sift);
+		envUpdate.mapEnvironment(getAllFeaturePoints(FeatureMatchingType.harris), FeatureMatchingType.harris);
+	}
+
+	private ArrayList<Point> getAllFeaturePoints(FeatureMatchingType type) {
+		ArrayList<Point> points = new ArrayList<>();
+
+		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
+			for(FeaturePoint fp : entry.getKey().getFeaturePoints()) {
+				if (fp.getFeatureMatchingType().isEqual(type)) {
+					points.add(fp.getPoint());
+				}
+			}
+		}
+
+		return points;
 	}
 
 	private void setAgentsInformation(ArrayList<String> information) {

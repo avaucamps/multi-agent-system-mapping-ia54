@@ -7,12 +7,12 @@ public class Agent {
 	private String id;
 	private String imagePath;
 	private HashMap<Agent, Vector3> neighbors;
-	private ArrayList<Point> featurePoints;
+	private ArrayList<FeaturePoint> featurePoints;
 	
 	public Agent(String id) {
 		this.id = id;
 		neighbors = new HashMap<Agent, Vector3>();
-		featurePoints = new ArrayList<Point>();
+		featurePoints = new ArrayList<FeaturePoint>();
 		System.out.println("[" + id + "]Agent has been created.");
 	}
 	
@@ -39,9 +39,11 @@ public class Agent {
 		}
 	}
 
-	public void addFeaturePoint(Point p) {
+	public void addFeaturePoint(FeaturePoint p) {
 		featurePoints.add(p);
 	}
+
+	public ArrayList<FeaturePoint> getFeaturePoints() { return featurePoints; }
 
 	private void addNeighbor(Agent agent, Vector3 relativePosition) {
 		neighbors.put(agent, relativePosition);

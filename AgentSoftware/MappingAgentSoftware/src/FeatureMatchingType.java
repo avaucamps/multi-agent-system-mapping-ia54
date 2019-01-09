@@ -11,4 +11,12 @@ public enum FeatureMatchingType {
     public String toString() {
         return name;
     }
+
+    public boolean isEqual(FeatureMatchingType type) {
+        if (name.equals(type.toString())) {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -11,6 +11,7 @@ from matching_point import MatchingPoint
 import time
 from skimage import io
 from utils import get_neighbors_object
+import math
 
 def detect_harris_features(agent, all_agents):
     neighbors_id = agent.get_neighbors_id()
@@ -46,6 +47,7 @@ def match_corner(img_orig, img_warped, coord, coords_warped, coords_warped_subpi
     for cr, cc in coords_warped:
         window_warped = img_warped[cr-window_ext:cr+window_ext+1,
                                    cc-window_ext:cc+window_ext+1, :]
+       
         SSD = np.sum(weights * (window_orig - window_warped)**2)
         SSDs.append(SSD)
 
@@ -76,6 +78,9 @@ def get_image_matches(agent1, agent2, nmatches=5):
 
     matching_points = []
     for coord in coords_img1_subpix:
+        if math.isnan(coord[0]) or math.isnan(coord[1]):
+            continue
+
         coord_warped = match_corner(img1, img2, coord, coords_img2, coords_img2_subpix)
         x1 = coord[0]
         y1 = coord[1]
