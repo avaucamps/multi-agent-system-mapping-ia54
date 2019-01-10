@@ -11,7 +11,7 @@ public class AgentManager : MonoBehaviour
     public Camera agent;
     public Vector3 positionModel;
     public Vector3 scaleModel;
-    public int numberOfAgents = 50;
+    public int numberOfAgents = 500;
     public bool isScreenshotEnabled = false;
 
     private Vector3 positionStart;
@@ -33,7 +33,7 @@ public class AgentManager : MonoBehaviour
 
     void Start()
     {
-        networkManager = NetworkManager.Instance;
+        /*networkManager = NetworkManager.Instance;
 
         directoryPath = "Session_" + System.DateTime.Now.ToString("dd-MM-yyyy_HH-mmss");
         if (isScreenshotEnabled)
@@ -41,13 +41,13 @@ public class AgentManager : MonoBehaviour
             Directory.CreateDirectory(directoryPath);
         }
 
-        SetBounds();
+        */SetBounds();
         SpawnCameras(numberOfAgents);
 
-        if (isScreenshotEnabled)
+        /*if (isScreenshotEnabled)
         {
             StartCoroutine(TakeAllScreenshot());
-        }
+        }*/
     }
 
     private void Update()
@@ -120,7 +120,7 @@ public class AgentManager : MonoBehaviour
 
     private void SpawnCameras(int number)
     {
-        /*for (int i = 0; i < number; i++)
+        for (int i = 0; i < number; i++)
         {
             Vector3 position = GetRandomCoordinate();
             Camera agentInstance = Instantiate(
@@ -132,8 +132,8 @@ public class AgentManager : MonoBehaviour
             agentInstance.transform.rotation = Quaternion.Euler(-90, 0, 0);
             agentInstance.name = agentInstance.GetInstanceID().ToString();
             agentsDict.Add(agentInstance, position);
-        }*/
-        Vector3 position = new Vector3(-2.382f, -0.283f, 18.819f);
+        }
+        /*Vector3 position = new Vector3(-2.382f, -0.283f, 18.819f);
         Camera agentInstance = Instantiate(
             agent,
             position,
@@ -155,7 +155,7 @@ public class AgentManager : MonoBehaviour
         agentInstance2.name = agentInstance2.GetInstanceID().ToString();
         agentsDict.Add(agentInstance2, position2);
         
-        networkManager.SendMessage((int) MessageType.sendNumberOfAgents, "2");
+        networkManager.SendMessage((int) MessageType.sendNumberOfAgents, "2");*/
     }
 
     private void SetBounds()
@@ -167,10 +167,11 @@ public class AgentManager : MonoBehaviour
     private Vector3 GetRandomCoordinate()
     {
         return new Vector3(
-            Random.Range(positionModel.x + 0.5f, positionModel.x - 2.5f),
-            //Random.Range(positionStart.y, positionEnd.y),
+            //Random.Range(positionModel.x + 0.5f, positionModel.x - 2.5f),
+            Random.Range(positionStart.x, positionEnd.x),
             0,
-            Random.Range(positionModel.z - 0.5f, positionModel.z + 1.5f)
+            //Random.Range(positionModel.z - 0.5f, positionModel.z + 1.5f)
+            Random.Range(positionStart.z, positionEnd.z)
         );
     }
 
