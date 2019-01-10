@@ -52,6 +52,8 @@ public class ImageProcessingClientHandler extends ClientHandler {
                     bytes.add(b);
                 }
             }
+
+        action.onMatchingPointsReceived();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,7 +99,7 @@ public class ImageProcessingClientHandler extends ClientHandler {
 
         System.out.println("[" + agent1Id + "]" + "Feature point received: " + p1.getX() + ", " + p1.getY()
                 + " , " + type.toString() + ".");
-        System.out.println("[" + agent1Id + "]" + "Feature point received: " + p2.getX() + ", " + p2.getY()
+        System.out.println("[" + agent2Id + "]" + "Feature point received: " + p2.getX() + ", " + p2.getY()
                 + " , " + type.toString() + ".");
     }
 }

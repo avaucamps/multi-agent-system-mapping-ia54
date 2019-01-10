@@ -7,4 +7,5 @@ public interface Action {
 	void agentTookScreenshot(String id, String filepath);
 	void onNewMatchingPoint(MatchingPoint matchingPoint);
 	void onNewWorldFeaturePoint(String id, Point worldPoint, Point screenPoint, FeatureMatchingType type);
+	void onMatchingPointsReceived();
 }

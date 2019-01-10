@@ -15,6 +15,9 @@ public class CustomPanel extends Panel {
         for (Point p: points) {
             g.fillOval((int) p.getX(), (int) p.getY(),5,5);
         }
+
+        g.setColor(Color.red);
+        g.fillOval(getWidth()/2, getHeight()/2, 5,5);
     }
 
     private ArrayList<Point> updatePointsWithAxis(ArrayList<Point> points) {

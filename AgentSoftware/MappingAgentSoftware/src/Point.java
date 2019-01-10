@@ -20,6 +20,10 @@ public class Point {
         return y;
     }
 
+    public void setX(double x) { this.x = x; }
+
+    public void setY(double y) { this.y = y; }
+
     public Point subtract(Point other) {
         return new Point(
                 x - other.getX(),

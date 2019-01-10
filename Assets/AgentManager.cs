@@ -11,7 +11,7 @@ public class AgentManager : MonoBehaviour
     public Camera agent;
     public Vector3 positionModel;
     public Vector3 scaleModel;
-    public int numberOfAgents = 500;
+    public int numberOfAgents = 150;
     public bool isScreenshotEnabled = false;
 
     private Vector3 positionStart;
@@ -33,7 +33,7 @@ public class AgentManager : MonoBehaviour
 
     void Start()
     {
-        /*networkManager = NetworkManager.Instance;
+        networkManager = NetworkManager.Instance;
 
         directoryPath = "Session_" + System.DateTime.Now.ToString("dd-MM-yyyy_HH-mmss");
         if (isScreenshotEnabled)
@@ -41,13 +41,13 @@ public class AgentManager : MonoBehaviour
             Directory.CreateDirectory(directoryPath);
         }
 
-        */SetBounds();
+        SetBounds();
         SpawnCameras(numberOfAgents);
 
-        /*if (isScreenshotEnabled)
+        if (isScreenshotEnabled)
         {
             StartCoroutine(TakeAllScreenshot());
-        }*/
+        }
     }
 
     private void Update()
@@ -87,8 +87,8 @@ public class AgentManager : MonoBehaviour
             if (pair.Key.name != agentId) continue;
             pair.Key.enabled = true;
             Ray ray = pair.Key.ScreenPointToRay(screenPoint);
-            RaycastHit hit;
-            if(Physics.Raycast(ray, out hit, 100))
+            RaycastHit hit = new RaycastHit();
+            if(Physics.Raycast(ray, out hit))
             {
                 return hit.point;
             }
@@ -133,29 +133,8 @@ public class AgentManager : MonoBehaviour
             agentInstance.name = agentInstance.GetInstanceID().ToString();
             agentsDict.Add(agentInstance, position);
         }
-        /*Vector3 position = new Vector3(-2.382f, -0.283f, 18.819f);
-        Camera agentInstance = Instantiate(
-            agent,
-            position,
-            Quaternion.identity
-        );
-        agentInstance.enabled = false;
-        agentInstance.transform.rotation = Quaternion.Euler(-90, 0, 0);
-        agentInstance.name = agentInstance.GetInstanceID().ToString();
-        agentsDict.Add(agentInstance, position);
-
-        Vector3 position2 = new Vector3(-2.832f, -0.283f, 18.861f);
-        Camera agentInstance2 = Instantiate(
-            agent,
-            position2,
-            Quaternion.identity
-        );
-        agentInstance2.enabled = false;
-        agentInstance2.transform.rotation = Quaternion.Euler(-90, 0, 0);
-        agentInstance2.name = agentInstance2.GetInstanceID().ToString();
-        agentsDict.Add(agentInstance2, position2);
         
-        networkManager.SendMessage((int) MessageType.sendNumberOfAgents, "2");*/
+        networkManager.SendMessage((int) MessageType.sendNumberOfAgents, number.ToString());
     }
 
     private void SetBounds()
@@ -167,10 +146,8 @@ public class AgentManager : MonoBehaviour
     private Vector3 GetRandomCoordinate()
     {
         return new Vector3(
-            //Random.Range(positionModel.x + 0.5f, positionModel.x - 2.5f),
             Random.Range(positionStart.x, positionEnd.x),
             0,
-            //Random.Range(positionModel.z - 0.5f, positionModel.z + 1.5f)
             Random.Range(positionStart.z, positionEnd.z)
         );
     }

@@ -78,10 +78,16 @@ def match_corner(img_orig, img_warped, coord, coords_warped, coords_warped_subpi
         window_warped = img_warped[cr-window_ext:cr+window_ext+1,
                                    cc-window_ext:cc+window_ext+1, :]
        
+        if window_orig.shape != window_warped.shape:
+            continue
+
         SSD = np.sum(weights * (window_orig - window_warped)**2)
         SSDs.append(SSD)
 
     # use corner with minimum SSD as correspondence
+    if not SSDs:
+        return
+
     min_idx = np.argmin(SSDs)
     return coords_warped_subpix[min_idx]
 
@@ -107,24 +113,19 @@ def get_image_matches(agent1, agent2, nmatches=5):
                                         window_size=9)
 
     matching_points = []
-    src = []
-    dst = []
     for coord in coords_img1_subpix:
         if math.isnan(coord[0]) or math.isnan(coord[1]):
             continue
 
         coord_warped = match_corner(img1, img2, coord, coords_img2, coords_img2_subpix)
+        if coord_warped is None:
+            continue
+
         x1 = coord[0]
         y1 = coord[1]
         x2 = coord_warped[0]
         y2 = coord_warped[1]
-        src.append(coord)
-        dst.append(coord_warped)
         match_point = MatchingPoint(agent1.get_id(), agent2.get_id(), x1, y1, x2, y2)
         matching_points.append(match_point)
-
-    src = np.array(src)
-    dst = np.array(dst)
-    #show_images(src, dst, img1_gray, img2_gray)
 
     return matching_points

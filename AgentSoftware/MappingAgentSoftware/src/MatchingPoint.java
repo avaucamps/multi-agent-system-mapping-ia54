@@ -11,8 +11,6 @@ public class MatchingPoint {
         this.agent2Id = agent2Id;
         this.pointAgent2 = p2;
         this.featureMatchingType = featureMatchingType;
-
-        System.out.println("[" + agent1Id + "]New matching point added.");
     }
 
     public String getAgent1Id() {

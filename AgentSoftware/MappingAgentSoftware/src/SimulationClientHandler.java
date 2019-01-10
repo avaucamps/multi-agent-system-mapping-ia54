@@ -170,12 +170,12 @@ public class SimulationClientHandler extends ClientHandler {
         String[] splitMessage = fullMessage.split("#");
         String agentId = splitMessage[1];
         String featureMatchingType = splitMessage[2];
-        double screenX = Double.parseDouble(splitMessage[5]);
-        double screenY = Double.parseDouble(splitMessage[6]);
-        double worldX = Double.parseDouble(splitMessage[3]);
-        double worldY = Double.parseDouble(splitMessage[4]);
-        Point worldPoint = new Point(screenX, screenY);
-        Point screenPoint = new Point(worldX, worldY);
+        double screenX = Double.parseDouble(splitMessage[3]);
+        double screenY = Double.parseDouble(splitMessage[4]);
+        double worldX = Double.parseDouble(splitMessage[5]);
+        double worldY = Double.parseDouble(splitMessage[6]);
+        Point screenPoint = new Point(screenX, screenY);
+        Point worldPoint = new Point(worldX, worldY);
         System.out.println("[" + agentId + "]" +
                 "World point received: " + worldX + ", " + worldY + ", " + featureMatchingType);
 

@@ -16,9 +16,6 @@ def agents_received(agents, networkHandler):
     match_points_sift = [item for sublist in matching_points_sift for item in sublist]
     match_points_harris = [item for sublist in matching_points_harris for item in sublist]
 
-    match_points_sift = remove_duplicates_matching_points(match_points_sift)
-    match_points_harris = remove_duplicates_matching_points(match_points_harris)
-
     networkHandler.send_match_points_sift(match_points_sift)
     networkHandler.send_match_points_harris(match_points_harris)
 

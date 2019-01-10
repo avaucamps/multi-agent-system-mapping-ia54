@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
+import static javafx.scene.input.KeyCode.X;
+
 public class Environment {
 
 	private HashMap<Agent, Vector3> agents = new HashMap<Agent, Vector3>();
@@ -14,7 +16,8 @@ public class Environment {
 	private int numberOfAgents = 0;
 	private final int numberOfNeighbors = 3;
 	private String message = "";
-	
+	private int matchingPointsNumber = 0;
+
 	public Environment(EnvironmentUpdate envUpdate) {
 		this.envUpdate = envUpdate;
 		support = new PropertyChangeSupport(this);
@@ -54,6 +57,10 @@ public class Environment {
 		}
 
 		agentEvents.add(event);
+		if (event.getEventType().equals(AgentEvent.Event.getWorldPoint)) {
+			return;
+		}
+
 		int numberOfCurrentEvent = 0;
 		for(AgentEvent agentEvent : agentEvents) {
 			if (agentEvent.getEventType().equals(event.getEventType())) {
@@ -91,10 +98,6 @@ public class Environment {
 				entry.getKey().onNewImageProcessingFeaturePoint(
 						new FeaturePoint(matchingPoint.getPointAgent1(), matchingPoint.getFeatureMatchingType())
 				);
-			} else if (entry.getKey().getId().equals(matchingPoint.getAgent2Id())) {
-				entry.getKey().onNewImageProcessingFeaturePoint(
-						new FeaturePoint(matchingPoint.getPointAgent2(), matchingPoint.getFeatureMatchingType())
-				);
 			}
 		}
 	}
@@ -103,12 +106,18 @@ public class Environment {
 		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
 			if (entry.getKey().getId().equals(id)) {
 				Point agentPosition = new Point(entry.getValue().getX(), entry.getValue().getY());
+				agentPosition.setX(Math.abs(agentPosition.getX()));
+				agentPosition.setY(Math.abs(agentPosition.getY()));
 				Point pointForAgent = worldPoint.subtract(agentPosition);
 				entry.getKey().onNewWorldFeaturePoint(
 						new FeaturePoint(pointForAgent, type)
 				);
 			}
 		}
+	}
+
+	public void onMatchingPointsReceived() {
+		handleAgentEvent(AgentEvent.Event.getWorldPoint);
 	}
 
 	private void handleAgentEvent(AgentEvent.Event event) {

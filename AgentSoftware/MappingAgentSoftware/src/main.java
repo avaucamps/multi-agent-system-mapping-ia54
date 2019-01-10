@@ -45,6 +45,11 @@ public class main {
 			public void onNewWorldFeaturePoint(String id, Point worldPoint, Point screenPoint, FeatureMatchingType type) {
 				environment.onNewWorldFeaturePoint(id, worldPoint, screenPoint, type);
 			}
+
+			@Override
+			public void onMatchingPointsReceived() {
+				environment.onMatchingPointsReceived();
+			}
 		};
 
 		Server serverImageProcessing = new Server(9992, Server.ClientType.imageProcessing, action);
