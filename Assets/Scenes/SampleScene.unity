@@ -1497,7 +1497,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 20741576401637834, guid: 7ace36f4034f6134b91e852b1b1e7991, type: 2}
   positionModel: {x: 0, y: 0, z: 0}
-  scaleModel: {x: 1, y: 0.1, z: 1}
+  scaleModel: {x: 9, y: 0.1, z: 9}
   numberOfAgents: 100
   isScreenshotEnabled: 1
 --- !u!4 &780832082
