@@ -80,14 +80,6 @@ public class NetworkManager : MonoBehaviour
             clientThread = new Thread(Listen);
             clientThread.IsBackground = true;
             clientThread.Start();
-
-            var messagesToSend = new Dictionary<string, int>(messagesQueue);
-            Debug.Log(messagesToSend.Count);
-            messagesQueue.Clear();
-            foreach(KeyValuePair<string, int> pair in messagesToSend)
-            {
-                WriteSocket(pair.Value, pair.Key);
-            }
         }
         catch (Exception e)
         {
@@ -102,6 +94,13 @@ public class NetworkManager : MonoBehaviour
         stream = socketConnection.GetStream();
         reader = new StreamReader(stream);
         writer = new BinaryWriter(stream);
+        
+        foreach(KeyValuePair<string, int> pair in messagesQueue)
+        {
+            WriteSocket(pair.Value, pair.Key);
+        }
+        messagesQueue.Clear();
+        
         string allMessages = "";
         Byte[] messageBytes = new Byte[256];
         

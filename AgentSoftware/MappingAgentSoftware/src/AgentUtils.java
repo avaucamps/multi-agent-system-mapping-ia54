@@ -55,7 +55,12 @@ public class AgentUtils {
 		
 		return Optional.empty();
 	}
-	
+
+	/**
+	 * Returns a string with the id of the agent, its image path and its neighbors ids.
+	 * @param agent: the agent we want the string for.
+	 * @return a string with the information mentioned before.
+	 */
 	public static String getAgentInformation(Agent agent) {
 		String information = "";
 		
@@ -72,6 +77,21 @@ public class AgentUtils {
 		}
 		
 		return information;
+	}
+
+	public static String getAgentFeaturePointMessage(Agent agent, FeaturePoint point) {
+		String message = "";
+		message += "#";
+		message += point.getFeatureMatchingType().toString();
+		message += "#";
+		message += agent.getId();
+		message += "#";
+		message += point.getPoint().getX();
+		message += "#";
+		message += point.getPoint().getY();
+		message += "#";
+
+		return message;
 	}
 	
 	// Private methods

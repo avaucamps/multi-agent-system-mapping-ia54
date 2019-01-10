@@ -55,8 +55,6 @@ public class ImageProcessingClientHandler extends ClientHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        action.received2DMatchPoints(matchingPoints);
     }
 
     private void handleMessageReceived(ArrayList<Byte> matchPointsBytes) {
@@ -69,15 +67,15 @@ public class ImageProcessingClientHandler extends ClientHandler {
         String[] splitMessage = message.split("#");
 
         if (splitMessage[1].equals(FeatureMatchingType.sift.toString())) {
-            setMatchPoints(splitMessage, FeatureMatchingType.sift);
+            setMatchPoint(splitMessage, FeatureMatchingType.sift);
         } else if (splitMessage[1].equals(FeatureMatchingType.harris.toString())) {
-            setMatchPoints(splitMessage, FeatureMatchingType.harris);
+            setMatchPoint(splitMessage, FeatureMatchingType.harris);
         }
     }
 
-    private void setMatchPoints(String[] splitMessage, FeatureMatchingType type) {
-        String agent1_id = splitMessage[2];
-        String agent2_id = splitMessage[3];
+    private void setMatchPoint(String[] splitMessage, FeatureMatchingType type) {
+        String agent1Id = splitMessage[2];
+        String agent2Id = splitMessage[3];
 
         double x1 = Double.parseDouble(splitMessage[4]);
         double y1 = Double.parseDouble(splitMessage[5]);
@@ -87,17 +85,19 @@ public class ImageProcessingClientHandler extends ClientHandler {
         Point p1 = new Point(x1, y1);
         Point p2 = new Point(x2, y2);
 
-        matchingPoints.add(
+        action.onNewMatchingPoint(
                 new MatchingPoint(
-                        agent1_id,
-                        agent2_id,
+                        agent1Id,
+                        agent2Id,
                         p1,
                         p2,
                         type
                 )
         );
 
-        System.out.println("Received feature point from image processing: " + p1.toString()
+        System.out.println("[" + agent1Id + "]" + "Feature point received: " + p1.getX() + ", " + p1.getY()
+                + " , " + type.toString() + ".");
+        System.out.println("[" + agent1Id + "]" + "Feature point received: " + p2.getX() + ", " + p2.getY()
                 + " , " + type.toString() + ".");
     }
 }

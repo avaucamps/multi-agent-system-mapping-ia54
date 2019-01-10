@@ -21,14 +21,9 @@ public class SimulationClientHandler extends ClientHandler {
             return;
         }
 
-        ArrayList<MatchingPoint> matchingPoints = (ArrayList<MatchingPoint>) evt.getNewValue();
-        for(MatchingPoint matchingPoint: matchingPoints) {
-            String message = buildMessage(matchingPoint);
-            System.out.println("Message sent to simulation: " + message);
-            sendMessage(message);
-        }
-
-        sendMessage("Done");
+        String message = (String) evt.getNewValue();
+        System.out.println("Message sent to simulation: " + message);
+        sendMessage(message);
     }
 
     @Override
@@ -52,8 +47,6 @@ public class SimulationClientHandler extends ClientHandler {
                     //done = true;
                     if (!allScreenshotDone) {
                         allScreenshotDone = true;
-                    } else {
-                        action.allWorldFeaturePointsReceived();
                     }
 
                     continue;
@@ -183,11 +176,12 @@ public class SimulationClientHandler extends ClientHandler {
         double worldY = Double.parseDouble(splitMessage[4]);
         Point worldPoint = new Point(screenX, screenY);
         Point screenPoint = new Point(worldX, worldY);
-        System.out.println("World point received: " + worldX + ", " + worldY + ", " + featureMatchingType);
+        System.out.println("[" + agentId + "]" +
+                "World point received: " + worldX + ", " + worldY + ", " + featureMatchingType);
 
         FeatureMatchingType type = featureMatchingType.equals(FeatureMatchingType.sift.toString()) ?
                 FeatureMatchingType.sift : FeatureMatchingType.harris;
-        action.agentWorldFeaturePoint(agentId, worldPoint, screenPoint, type);
+        action.onNewWorldFeaturePoint(agentId, worldPoint, screenPoint, type);
     }
 
     private void handleNumberOfAgents(byte[] bytes) {
@@ -207,20 +201,5 @@ public class SimulationClientHandler extends ClientHandler {
         );
 
         return position3;
-    }
-
-    private String buildMessage(MatchingPoint matchingPoint) {
-        String message = "";
-        message += "#";
-        message += matchingPoint.getFeatureMatchingType().toString();
-        message += "#";
-        message += matchingPoint.getAgent1Id();
-        message += "#";
-        message += matchingPoint.getPointAgent1().getX();
-        message += "#";
-        message += matchingPoint.getPointAgent1().getY();
-        message += "#";
-
-        return message;
     }
 }

@@ -1,6 +1,3 @@
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 public class main {
 
 	private static MapDisplay mapDisplaySift;
@@ -9,8 +6,12 @@ public class main {
 	public static void main(String[] args) {
 		EnvironmentUpdate envUpdate = new EnvironmentUpdate() {
 			@Override
-			public void mapEnvironment(ArrayList<Point> points, FeatureMatchingType type) {
-				mapDisplaySift = new MapDisplay(points, type);
+			public void addPointToMap(Point point, FeatureMatchingType type) {
+				if (type.isEqual(FeatureMatchingType.harris)) {
+					handleHarrisMap(point);
+				} else if (type.isEqual(FeatureMatchingType.sift)) {
+					handleSiftMap(point);
+				}
 			}
 		};
 
@@ -36,18 +37,13 @@ public class main {
 			}
 
 			@Override
-			public void received2DMatchPoints(ArrayList<MatchingPoint> matchingPoints) {
-				environment.received2DMatchPoints(matchingPoints);
+			public void onNewMatchingPoint(MatchingPoint matchingPoint) {
+				environment.onNewMatchingPoint(matchingPoint);
 			}
 
 			@Override
-			public void agentWorldFeaturePoint(String id, Point worldPoint, Point screenPoint, FeatureMatchingType type) {
-				environment.agentWorldFeaturePoint(id, worldPoint, screenPoint, type);
-			}
-
-			@Override
-			public void allWorldFeaturePointsReceived() {
-				environment.allWorldFeaturePointsReceived();
+			public void onNewWorldFeaturePoint(String id, Point worldPoint, Point screenPoint, FeatureMatchingType type) {
+				environment.onNewWorldFeaturePoint(id, worldPoint, screenPoint, type);
 			}
 		};
 
@@ -56,5 +52,21 @@ public class main {
 
 		environment.addPropertyChangeListener(serverImageProcessing.getClientHandler());
 		environment.addPropertyChangeListener(serverSimulation.getClientHandler());
+	}
+
+	private static void handleHarrisMap(Point p) {
+		if (mapDisplayHarris == null) {
+			mapDisplayHarris = new MapDisplay(FeatureMatchingType.harris);
+		}
+
+		mapDisplayHarris.AddPoint(p);
+	}
+
+	private static void handleSiftMap(Point p) {
+		if (mapDisplaySift == null) {
+			mapDisplaySift = new MapDisplay(FeatureMatchingType.sift);
+		}
+
+		mapDisplaySift.AddPoint(p);
 	}
 }

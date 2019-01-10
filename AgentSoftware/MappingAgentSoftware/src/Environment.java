@@ -7,7 +7,6 @@ import java.util.*;
 
 public class Environment {
 
-	private ArrayList<MatchingPoint> matchPoints2D;
 	private HashMap<Agent, Vector3> agents = new HashMap<Agent, Vector3>();
 	private ArrayList<AgentEvent> agentEvents = new ArrayList<>();
 	private EnvironmentUpdate envUpdate;
@@ -18,7 +17,6 @@ public class Environment {
 	
 	public Environment(EnvironmentUpdate envUpdate) {
 		this.envUpdate = envUpdate;
-		matchPoints2D = new ArrayList<MatchingPoint>();
 		support = new PropertyChangeSupport(this);
 	}
 
@@ -42,8 +40,20 @@ public class Environment {
 	}
 
 	public void onAgentEvent(AgentEvent event) {
-		agentEvents.add(event);
+		if (event.getEventType().equals(AgentEvent.Event.addPointToMap)) {
+			Vector3 agentPosition = agents.get(event.getAgent());
+			Point agentPoint = new Point(agentPosition.getX(), agentPosition.getY());
+			Point pointInWorld = event.getFeaturePoint().getPoint().add(agentPoint);
 
+			envUpdate.addPointToMap(
+					pointInWorld,
+					event.getFeaturePoint().getFeatureMatchingType()
+			);
+
+			return;
+		}
+
+		agentEvents.add(event);
 		int numberOfCurrentEvent = 0;
 		for(AgentEvent agentEvent : agentEvents) {
 			if (agentEvent.getEventType().equals(event.getEventType())) {
@@ -75,25 +85,30 @@ public class Environment {
 		});
 	}
 
-	public void received2DMatchPoints(ArrayList<MatchingPoint> matchPoints) {
-		setAgents2DMatchPoints(matchPoints);
-	}
-
-	public void agentWorldFeaturePoint(String id, Point worldPoint, Point screenPoint, FeatureMatchingType type) {
-		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
-			if (entry.getKey().getId().equals(id)) {
-				Point agentPosition = new Point(entry.getValue().getX(), entry.getValue().getY());
-				Point pointForAgent = worldPoint.subtract(agentPosition);
-				entry.getKey().addFeaturePoint(
-						new FeaturePoint(pointForAgent, type)
+	public void onNewMatchingPoint(MatchingPoint matchingPoint) {
+		for(Map.Entry<Agent, Vector3> entry : agents.entrySet()) {
+			if (entry.getKey().getId().equals(matchingPoint.getAgent1Id())) {
+				entry.getKey().onNewImageProcessingFeaturePoint(
+						new FeaturePoint(matchingPoint.getPointAgent1(), matchingPoint.getFeatureMatchingType())
+				);
+			} else if (entry.getKey().getId().equals(matchingPoint.getAgent2Id())) {
+				entry.getKey().onNewImageProcessingFeaturePoint(
+						new FeaturePoint(matchingPoint.getPointAgent2(), matchingPoint.getFeatureMatchingType())
 				);
 			}
 		}
 	}
 
-	public void allWorldFeaturePointsReceived() {
-		envUpdate.mapEnvironment(getAllFeaturePoints(FeatureMatchingType.sift), FeatureMatchingType.sift);
-		envUpdate.mapEnvironment(getAllFeaturePoints(FeatureMatchingType.harris), FeatureMatchingType.harris);
+	public void onNewWorldFeaturePoint(String id, Point worldPoint, Point screenPoint, FeatureMatchingType type) {
+		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
+			if (entry.getKey().getId().equals(id)) {
+				Point agentPosition = new Point(entry.getValue().getX(), entry.getValue().getY());
+				Point pointForAgent = worldPoint.subtract(agentPosition);
+				entry.getKey().onNewWorldFeaturePoint(
+						new FeaturePoint(pointForAgent, type)
+				);
+			}
+		}
 	}
 
 	private void handleAgentEvent(AgentEvent.Event event) {
@@ -101,8 +116,11 @@ public class Environment {
 			case askNeighbors:
 				setNeighbors();
 				break;
-			case getMatchingPoints:
+			case getMatchingPoint:
 				sendMessagesToImageProcessing(event);
+				break;
+			case getWorldPoint:
+				sendMessagesToSimulation(event);
 				break;
 			default:
 				break;
@@ -115,20 +133,6 @@ public class Environment {
 					AgentUtils.getNeighbors(entry.getKey(), agents, numberOfNeighbors)
 			);
 		}
-	}
-
-	private ArrayList<Point> getAllFeaturePoints(FeatureMatchingType type) {
-		ArrayList<Point> points = new ArrayList<>();
-
-		for(Map.Entry<Agent, Vector3> entry: agents.entrySet()) {
-			for(FeaturePoint fp : entry.getKey().getFeaturePoints()) {
-				if (fp.getFeatureMatchingType().isEqual(type)) {
-					points.add(fp.getPoint());
-				}
-			}
-		}
-
-		return points;
 	}
 
 	private void sendMessagesToImageProcessing(AgentEvent.Event event) {
@@ -148,18 +152,32 @@ public class Environment {
 		support.firePropertyChange(
 				PropertyChangeConstants.IMAGE_PROCESSING_MESSAGE_NAME,
 				message,
-				"AllMessagesSent"
+				"Done"
 		);
 
-		this.message = "AllMessagesSent";
+		this.message = "Done";
 	}
 
-	private void setAgents2DMatchPoints(ArrayList<MatchingPoint> matchPoints) {
+	private void sendMessagesToSimulation(AgentEvent.Event event) {
+		for(AgentEvent agentEvent : agentEvents) {
+			if (!event.equals(agentEvent.getEventType())) {
+				continue;
+			}
+
+			support.firePropertyChange(
+					PropertyChangeConstants.SIMULATION_MESSAGE_NAME,
+					message,
+					agentEvent.getMessage()
+			);
+			this.message = agentEvent.getMessage();
+		}
+
 		support.firePropertyChange(
 				PropertyChangeConstants.SIMULATION_MESSAGE_NAME,
-				this.matchPoints2D,
-				matchPoints
+				message,
+				"Done"
 		);
-		this.matchPoints2D = matchPoints;
+
+		this.message = "Done";
 	}
 }

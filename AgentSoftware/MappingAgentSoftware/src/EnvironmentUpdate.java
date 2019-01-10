@@ -1,5 +1,5 @@
 import java.util.ArrayList;
 
 public interface EnvironmentUpdate {
-    public void mapEnvironment(ArrayList<Point> points, FeatureMatchingType type);
+    void addPointToMap(Point point, FeatureMatchingType type);
 }

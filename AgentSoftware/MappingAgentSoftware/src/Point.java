@@ -7,6 +7,11 @@ public class Point {
         this.y = y;
     }
 
+    public Point(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+    }
+
     public double getX() {
         return x;
     }
@@ -19,6 +24,13 @@ public class Point {
         return new Point(
                 x - other.getX(),
                 y - other.getY()
+        );
+    }
+
+    public Point add(Point other) {
+        return new Point(
+                x + other.getX(),
+                y + other.getY()
         );
     }
 }

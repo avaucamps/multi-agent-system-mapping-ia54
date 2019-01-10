@@ -86,11 +86,13 @@ public class AgentManager : MonoBehaviour
         {
             if (pair.Key.name != agentId) continue;
             pair.Key.enabled = true;
-            Ray ray = agent.ScreenPointToRay(new Vector3(screenPoint.x, screenPoint.y));
-            Vector3 point = ray.origin + (ray.direction * agent.nearClipPlane);
+            Ray ray = pair.Key.ScreenPointToRay(screenPoint);
+            RaycastHit hit;
+            if(Physics.Raycast(ray, out hit, 100))
+            {
+                return hit.point;
+            }
             pair.Key.enabled = false;
-
-            return point;
         }
 
         return Vector3.zero;

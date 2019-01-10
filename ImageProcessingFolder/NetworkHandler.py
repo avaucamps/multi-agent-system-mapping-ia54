@@ -1,5 +1,6 @@
 import socket
 from Agent import Agent
+import math
 
 class NetworkHandler:
 
@@ -20,7 +21,7 @@ class NetworkHandler:
             if (string_data == 'Q'):
                 self.close_connection()
                 done = True
-            elif (string_data == 'AllMessagesSent'):
+            elif (string_data == 'Done'):
                 self.agents_received(self.agents, self)
                 done = True
             else:
@@ -32,6 +33,9 @@ class NetworkHandler:
         endText = '\x04'
 
         for match_point in match_points:
+            if math.isnan(match_point.get_x1()) or math.isnan(match_point.get_x2()) or math.isnan(match_point.get_y1()) or math.isnan(match_point.get_y2()):
+                continue
+
             match_point_message = '#'
             match_point_message += "SIFT"
             match_point_message += "#"
@@ -60,6 +64,9 @@ class NetworkHandler:
         endText = '\x04'
 
         for match_point in match_points:
+            if math.isnan(match_point.get_x1()) or math.isnan(match_point.get_x2()) or math.isnan(match_point.get_y1()) or math.isnan(match_point.get_y2()):
+                continue
+                
             match_point_message = '#'
             match_point_message += "HARRIS"
             match_point_message += "#"

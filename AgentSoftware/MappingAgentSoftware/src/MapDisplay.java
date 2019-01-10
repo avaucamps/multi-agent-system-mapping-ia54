@@ -8,10 +8,14 @@ public class MapDisplay {
     private JFrame frame;
     private CustomPanel panel;
 
-    public MapDisplay(ArrayList<Point> points, FeatureMatchingType type) {
-        this.points = points;
+    public MapDisplay(FeatureMatchingType type) {
+        points = new ArrayList<>();
         showFrame();
         frame.setTitle("Detection with " + type.toString() + " features.");
+    }
+
+    public void AddPoint(Point p) {
+        points.add(p);
         setPoints();
     }
 
