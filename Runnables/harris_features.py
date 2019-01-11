@@ -5,7 +5,6 @@ from skimage.util import img_as_float
 from skimage.feature import (corner_harris, corner_subpix, corner_peaks, plot_matches)
 from skimage.color import rgb2gray
 from skimage.measure import ransac
-import matplotlib.pyplot as plt
 import os
 from matching_point import MatchingPoint
 import time
@@ -33,35 +32,6 @@ def gaussian_weights(window_ext, sigma=1):
     g[:] = np.exp(-0.5 * (x**2 / sigma**2 + y**2 / sigma**2))
     g /= 2 * np.pi * sigma * sigma
     return g
-
-def show_images(src, dst, img_orig_gray, img_warped_gray):
-        # estimate affine transform model using all coordinates
-        model = AffineTransform()
-        model.estimate(src, dst)
-
-        # robustly estimate affine transform model with RANSAC
-        model_robust, inliers = ransac((src, dst), AffineTransform, min_samples=3,
-                                    residual_threshold=2, max_trials=100)
-        outliers = inliers == False
-
-        # visualize correspondence
-        fig, ax = plt.subplots(nrows=2, ncols=1)
-
-        plt.gray()
-
-        inlier_idxs = np.nonzero(inliers)[0]
-        plot_matches(ax[0], img_orig_gray, img_warped_gray, src, dst,
-                    np.column_stack((inlier_idxs, inlier_idxs)), matches_color='b')
-        ax[0].axis('off')
-        ax[0].set_title('Correct correspondences')
-
-        outlier_idxs = np.nonzero(outliers)[0]
-        plot_matches(ax[1], img_orig_gray, img_warped_gray, src, dst,
-                    np.column_stack((outlier_idxs, outlier_idxs)), matches_color='r')
-        ax[1].axis('off')
-        ax[1].set_title('Faulty correspondences')
-
-        plt.show()
 
 def match_corner(img_orig, img_warped, coord, coords_warped, coords_warped_subpix, window_ext=5):
     r, c = np.round(coord).astype(np.intp)
