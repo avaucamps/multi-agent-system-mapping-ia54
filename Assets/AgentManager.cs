@@ -35,7 +35,7 @@ public class AgentManager : MonoBehaviour
     {
         networkManager = NetworkManager.Instance;
 
-        directoryPath = "Session_" + System.DateTime.Now.ToString("dd-MM-yyyy_HH-mmss");
+        directoryPath = Application.persistentDataPath + "\\Session_" + System.DateTime.Now.ToString("dd-MM-yyyy_HH-mmss");
         if (isScreenshotEnabled)
         {
             Directory.CreateDirectory(directoryPath);

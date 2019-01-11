@@ -3,8 +3,7 @@ from Agent import Agent
 from sift_features import detect_sift_features
 from harris_features import detect_harris_features
 from utils import remove_duplicates_matching_points
-
-#Change base path when finished
+import os
 
 def agents_received(agents, networkHandler):
     matching_points_sift = []
